@@ -7,7 +7,7 @@ function getSvgText(weight: number, height: number, fontWeight: number, fontSize
     return `<svg width="${weight}" height="${height}" xmlns="http://www.w3.org/2000/svg"><defs><style>.title { font-family: 'MinSans-Bold'; font-weight: ${fontWeight}; font-size: ${fontSize}px; fill: white; } </style></defs><text x="50%" y="50%" text-anchor="middle" class="title">${text}</text></svg>`
 }
 
-export async function applyBlur(config: any, Link: string , Spotify_Search : any): Promise<void> {
+export async function applyBlur(config: any, Link: string, Spotify_Search: any): Promise<void> {
 
     const progressBar = new cliProgress.SingleBar({
         format: `{status} |${chalk.blue("{bar}")}| {percentage}% | {value}/{total} Chunks`,
@@ -39,8 +39,9 @@ export async function applyBlur(config: any, Link: string , Spotify_Search : any
 
 
         progressBar.update(3, { status: '트랙 정보 추가 중..' });
-        const svgText = getSvgText(1000 , 1000 , 900 , 30 , Spotify_Search.title);
-        const svgText2 = getSvgText(1000 , 1000 , 600 , 26 , Spotify_Search.artist);
+        
+        const svgText = getSvgText(1000, 1000, 900, 30, Spotify_Search.title);
+        const svgText2 = getSvgText(1000, 1000, 600, 26, Spotify_Search.artist);
         await sharp(default_image)
             .composite([
                 { input: Buffer.from(svgText), left: Math.floor(((config.Width / 2) / 2) - 500), top: Math.floor(((config.Height) / 2) - 210) - 35 },
@@ -52,8 +53,8 @@ export async function applyBlur(config: any, Link: string , Spotify_Search : any
         progressBar.update(4, { status: "섬네일 이미지 생성완료." });
         progressBar.stop();
     } catch (error) {
-        console.log('\n' + error)
         progressBar.stop();
+        console.log('\n' + error)
         throw new Error(chalk.red(`섬네일 이미지 생성 실패.`));
     }
 }
