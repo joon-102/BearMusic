@@ -4,7 +4,7 @@ const sharp = require('sharp');
 const chalk = require('chalk');
 
 function getSvgText(weight: number, height: number, fontWeight: number, fontSize: number, text: string) {
-    return `<svg width="${weight}" height="${height}" xmlns="http://www.w3.org/2000/svg"><defs><style>.title { font-family: 'MinSans-Bold'; font-weight: ${fontWeight}; font-size: ${fontSize}px; fill: white; } </style></defs><text x="50%" y="50%" text-anchor="middle" class="title">${text}</text></svg>`
+    return `<svg width="${weight}" height="${height}" viewBox="0 0 ${weight} ${height}" xmlns="http://www.w3.org/2000/svg"><defs><style>.title { font-family: 'MinSans-Bold'; font-weight: ${fontWeight}; font-size: ${fontSize}px; fill: white; } </style></defs><text x="50%" y="50%" text-anchor="middle" dy=".3em" class="title">${text}</text></svg>`
 }
 
 export async function applyBlur(config: any, Link: string, Spotify_Search: any): Promise<void> {
