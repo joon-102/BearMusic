@@ -2,9 +2,11 @@ const cliProgress = require('cli-progress');
 const fetch = require('node-fetch');
 const sharp = require('sharp');
 const chalk = require('chalk');
+const fs = require('fs');
 
 function getSvgText(weight: number, height: number, fontWeight: number, fontSize: number, text: string) {
-    return `<svg width="${weight}" height="${height}" viewBox="0 0 ${weight} ${height}" xmlns="http://www.w3.org/2000/svg"><defs><style>.title { font-family: 'MinSans-Bold'; font-weight: ${fontWeight}; font-size: ${fontSize}px; fill: white; } </style></defs><text x="50%" y="50%" text-anchor="middle" dy=".3em" class="title">${text}</text></svg>`
+    text = text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&apos;");
+    return `<svg width="${weight - 10}" height="${height - 10}" viewBox="0 0 ${weight} ${height}" xmlns="http://www.w3.org/2000/svg"><defs><style>.title { word-spacing : 0.1px; font-family: 'Pretendard'; font-weight: ${fontWeight}; font-size: ${fontSize}px; fill: white; } </style></defs><text x="50%" y="50%" text-anchor="middle" dy=".3em" class="title">${text}</text></svg>`
 }
 
 export async function applyBlur(config: any, Link: string, Spotify_Search: any): Promise<void> {
@@ -23,10 +25,18 @@ export async function applyBlur(config: any, Link: string, Spotify_Search: any):
         const buffer = await response.buffer();
 
         progressBar.update(2, { status: '이미지 처리 중...' });
-        const composite = await sharp(buffer)
+
+        await sharp(buffer)
             .resize(420, 420)
-            .extend({ top: 1, bottom: 1, left: 1, right: 1, background: { r: 255, g: 255, b: 255, alpha: 0.2 } })
-            .toBuffer()
+            .composite([{
+                input: Buffer.from(
+                    `<svg width="420" height="420">
+                    <rect x="0" y="0" width="420" height="420" rx="20" ry="20" fill="black"/>
+                    </svg>`
+                ),
+                blend: 'dest-in'
+            }])
+            .toFile('temp/Thumbnail_Small_Blur.png');
 
         const default_image = await sharp(buffer)
             .resize(config.Width, config.Height)
@@ -34,18 +44,25 @@ export async function applyBlur(config: any, Link: string, Spotify_Search: any):
             .sharpen()
             .blur(40)
             .flatten({ background: { r: 232, g: 158, b: 111 } })
-            .composite([{ input: composite, left: Math.floor(((config.Width / 2) / 2) - 210), top: Math.floor(((config.Height) / 2) - 210), blend: 'over' }])
+            .composite([{ input: await sharp("temp/Thumbnail_Small_Blur.png").toBuffer(), left: Math.floor(((config.Width / 2) / 2) - 210), top: Math.floor(((config.Height) / 2) - 210), blend: 'over' }])
             .toBuffer();
 
 
+        try {
+            fs.unlinkSync("temp/Thumbnail_Small_Blur.png");
+        } catch {
+            /* do nothing */
+        }
+
+
         progressBar.update(3, { status: '트랙 정보 추가 중..' });
-        
+
         const svgText = getSvgText(1000, 1000, 900, 30, Spotify_Search.title);
         const svgText2 = getSvgText(1000, 1000, 600, 26, Spotify_Search.artist);
         await sharp(default_image)
             .composite([
-                { input: Buffer.from(svgText), left: Math.floor(((config.Width / 2) / 2) - 500), top: Math.floor(((config.Height) / 2) - 210) - 35 },
-                { input: Buffer.from(svgText2), left: Math.floor(((config.Width / 2) / 2) - 500), top: Math.floor(((config.Height) / 2) - 210) + 4 }
+                { input: Buffer.from(svgText), left: Math.floor(((config.Width / 2) / 2) - 500), top: Math.floor(((config.Height) / 2) - 210) - 40 },
+                { input: Buffer.from(svgText2), left: Math.floor(((config.Width / 2) / 2) - 500), top: Math.floor(((config.Height) / 2) - 210) - 2 }
             ])
             .toFile('temp/Thumbnail_Blur.png');
 
