@@ -5,7 +5,7 @@
   "main": "dist/index.js",
   "type": "commonjs",
   "scripts": {
-    "start": "node test/test.js",
+    "start": "node dist/index.j",
     "build": "tsc -w",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
