@@ -1,21 +1,18 @@
-import { getPreview, getLyrics } from './util/getSpotify';
-import { applyBlur } from './util/imageProcessor';
+import { getPreview, getLyrics, getMp3  } from './util/getSpotify';
+import { BasicImage, LyricsImage } from './util/imageProcessor';
+import { VideoCreation } from './util/videoProcessor';
+import fs from 'fs-extra';
 
 const config = require('../config.json');
 
 (async () => {
-    const Spotify_Search = await getPreview(config)
-   
-    // console.log(Spotify_Search)
+    await fs.emptyDirSync('temp/lyrics');
 
-    console.info(`노래를 찾았습니다. : ${Spotify_Search.artist} - ${Spotify_Search.title}`)
-
-    const Lyrics_Find = await getLyrics(config)
-
-    // console.log(Lyrics_Find)
-
-    const Thumbnail_Blur = await applyBlur(config, Spotify_Search.image , Spotify_Search )
-
-
-
+    const Spotify_Search = await getPreview(config);
+    console.info(`트랙를 찾았습니다. : ${Spotify_Search.title} - ${Spotify_Search.artist}`);
+    const Lyrics_Find = await getLyrics(config);
+    await BasicImage(config, Spotify_Search);
+    await LyricsImage(config, Lyrics_Find.lines)
+    await getMp3(config)
+    await VideoCreation(config , Lyrics_Find.lines)
 })();

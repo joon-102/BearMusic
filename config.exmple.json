@@ -1,7 +1,22 @@
 {
-    "Language": "ko",
     "SpotifyCookie": "",
     "TrackId": "",
-    "Width": 1920,
-    "Height": 1080
+    "album_cover": {
+        "width": 1000,
+        "height": 1000,
+        "round": 10
+    },
+    "background_photo": {
+        "width": 2560,
+        "height": 1440,
+        "shadow": 0.38,
+        "brightness": 0.8,
+        "saturation": 1.15,
+        "blur": 40,
+        "flatten": {
+            "r": 232,
+            "g": 158,
+            "b": 111
+        }
+    }
 }
