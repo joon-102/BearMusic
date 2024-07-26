@@ -84,7 +84,14 @@ export async function LyricsImage(config: any, lyrics: any): Promise<void> {
 
     for (let index = 0; index < lyrics.length; index++) {
         const text = lyrics[index].words || "♪";
-        const size = text === "♪" ? 100 : 70;
+        let size
+
+        if (text === "♪") {
+            size = 100;
+        } else {
+            size = text.length > 17 ? 60 : 70;
+        }
+
         const svgText = getSvgText(1500, 1000, 600, size, text);
 
         await sharp("temp/Thumbnail_Blur.png")
@@ -92,10 +99,10 @@ export async function LyricsImage(config: any, lyrics: any): Promise<void> {
             .toFormat('png')
             .toFile(`temp/lyrics/${index + 1}.png`);
 
-        progressBar.update(index + 1, { status: `${index + 1} 번째 이미지 합성  중...` });
+        progressBar.update(index + 1, { status: `${index + 1} 번째 이미지 합성 중...` });
     }
 
     progressBar.stop();
     process.stdout.write('\x1B[1A\x1B[2K');
-    process.stdout.write(`가사 이미지 합성 완료. , 소요시간 ${((perhooks.performance.now() - start) / 1000).toFixed(1)}초\n`);
+    process.stdout.write(`가사 이미지 합성 완료 , 소요시간 ${((perhooks.performance.now() - start) / 1000).toFixed(1)}초\n`);
 }
