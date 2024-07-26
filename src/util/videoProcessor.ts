@@ -63,7 +63,7 @@ async function InsertAudio() {
             .audioCodec('aac')
             .videoCodec('libx264')
             .on('progress', (progress: { percent: any; }) => {
-                process.stdout.write(`\r${spinnerChars[currentCharIndex]} 오디오 합성중... ${progress.percent}% 완료`);
+                process.stdout.write(`\r${spinnerChars[currentCharIndex]} 오디오 합성중... ${String(progress.percent).split(".")[0]}% 완료`);
                 currentCharIndex = (currentCharIndex + 1) % spinnerChars.length;
             })
             .on('error', (err: { message: any; }) => {

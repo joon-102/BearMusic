@@ -50,8 +50,13 @@ export async function BasicImage(config: any, Spotify_Search: any): Promise<void
     process.stdout.write('\x1B[1A\x1B[2K');
     process.stdout.write(`기본 이미지 생성 완료 , 소요시간 ${((perhooks.performance.now() - start) / 1000).toFixed(1)}초\n`);
 
-    const svgText = getSvgText(1000, 1000, 900, 75, Spotify_Search.title);
-    const svgText2 = getSvgText(1000, 1000, 600, 58, Spotify_Search.artist);
+    let size = [75,58]
+    if(Spotify_Search.title.length > 14) {
+        size = [67,50]
+    }
+
+    const svgText = getSvgText(1000, 1000, 900, size[0], Spotify_Search.title);
+    const svgText2 = getSvgText(1000, 1000, 600, size[1], Spotify_Search.artist);
     await sharp(Background_photo)
         .composite([
             { input: Buffer.from(svgText), left: Math.floor(((config.background_photo.width / 2) / 2) - 500), top: (Math.floor(config.background_photo.height / 2) + 13) },

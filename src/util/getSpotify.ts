@@ -5,7 +5,10 @@ const fetch = require('node-fetch');
 const fs = require('node:fs');
 
 export async function getPreview(config: any) {
-    return await spotify(fetch).getPreview(`https://open.spotify.com/track/` + config.TrackId, { headers: { 'Accept-Language': 'ko' } });;
+    return [
+        await spotify(fetch).getPreview(`https://open.spotify.com/track/` + config.TrackId, { headers: { 'Accept-Language': `ko` } }), 
+        await spotify(fetch).getPreview(`https://open.spotify.com/track/` + config.TrackId)
+    ]
 }
 
 export async function getLyrics(config: any): Promise<{ syncType: string; language: string; lines: [time: number, words: string] }> {
