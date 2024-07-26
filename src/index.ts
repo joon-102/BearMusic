@@ -10,7 +10,7 @@ const config = require('../config.json');
     const Spotify_Search = await getPreview(config);
     console.info(`트랙를 찾았습니다. : ${Spotify_Search[0].title} - ${Spotify_Search[0].artist}`);
     const Lyrics_Find = await getLyrics(config);
-    await BasicImage(config, Spotify_Search);
+    await BasicImage(config, Spotify_Search[0]);
     await LyricsImage(config, Lyrics_Find.lines)
     await getMp3(config)
     await VideoCreation(config , Lyrics_Find.lines)
