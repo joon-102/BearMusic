@@ -1,7 +1,6 @@
 const ffmpegInstaller = require('@ffmpeg-installer/ffmpeg');
 const perhooks = require('node:perf_hooks');
 const ffmpeg = require('fluent-ffmpeg');
-const fs = require('node:fs')
 
 ffmpeg.setFfmpegPath(ffmpegInstaller.path);
 
@@ -18,7 +17,7 @@ export async function VideoCreation(config: any, lyrics: any): Promise<void> {
     await InsertAudio();
 }
 
-async function BasicVideoCreation(LyricsList: any) {
+async function BasicVideoCreation(LyricsList: any): Promise<void>  {
     return new Promise<void>((resolve, reject) => {
         const startTime = perhooks.performance.now();
         const spinnerChars = ['|', '/', '-', '\\'];
@@ -51,7 +50,7 @@ async function BasicVideoCreation(LyricsList: any) {
     });
 }
 
-async function InsertAudio() {
+async function InsertAudio() : Promise<void> {
     return new Promise<void>((resolve, reject) => {
         const startTime = perhooks.performance.now();
         const spinnerChars = ['|', '/', '-', '\\'];
@@ -62,15 +61,17 @@ async function InsertAudio() {
             .input("temp/music.mp3")
             .audioCodec('aac')
             .videoCodec('libx264')
-            .on('progress', (progress: { percent: any; }) => {
-                process.stdout.write(`\r${spinnerChars[currentCharIndex]} 오디오 합성중... ${String(progress.percent).split(".")[0]}% 완료`);
+            .on('progress', (progress  : any) => {
+                process.stdout.write(`\r${spinnerChars[currentCharIndex]} 오디오 합성중... ${Math.floor(progress.percent)}% 완료`);
                 currentCharIndex = (currentCharIndex + 1) % spinnerChars.length;
             })
-            .on('error', (err: { message: any; }) => {
+            .on('error', (err: any) => {
                 console.error(`오디오 추가 오류: ${err.message}`);
+                reject(err);
             })
             .on('end', async () => {
                 process.stdout.write(`\r오디오 합성 완료 , 소요시간 : ${((perhooks.performance.now() - startTime) / 1000).toFixed(1)}초.\n`);
+                resolve();
             })
             .output('temp/video.mp4')
             .run();

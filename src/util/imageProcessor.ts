@@ -2,11 +2,11 @@ const cliProgress = require('cli-progress');
 const perhooks = require('node:perf_hooks');
 const fetch = require('node-fetch');
 const sharp = require('sharp');
-const fs = require("node:fs");
 
-function getSvgText(weight: number, height: number, fontWeight: number, fontSize: number, text: string) {
-    text = text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&apos;");
-    return `<svg width="${weight - 10}" height="${height - 10}" viewBox="0 0 ${weight} ${height}" xmlns="http://www.w3.org/2000/svg"><defs><style>.title { word-spacing : 0.1px; font-family: 'Pretendard'; font-weight: ${fontWeight}; font-size: ${fontSize}px; fill: white; } </style></defs><text x="50%" y="50%" text-anchor="middle" dy=".3em" class="title">${text}</text></svg>`
+function getSvgText(weight: number, height: number, fontWeight: number, fontSize: number, text: string): Buffer  {
+    text = text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&apos;").replace('"', "");
+    const svg : string = `<svg width="${weight - 10}" height="${height - 10}" viewBox="0 0 ${weight} ${height}" xmlns="http://www.w3.org/2000/svg"><defs><style>.title { word-spacing : 0.1px; font-family: 'Pretendard'; font-weight: ${fontWeight}; font-size: ${fontSize}px; fill: white; } </style></defs><text x="50%" y="50%" text-anchor="middle" dy=".3em" class="title">${text}</text></svg>`;
+    return Buffer.from(svg);
 }
 
 export async function BasicImage(config: any, Spotify_Search: any): Promise<void> {
@@ -50,26 +50,22 @@ export async function BasicImage(config: any, Spotify_Search: any): Promise<void
     process.stdout.write('\x1B[1A\x1B[2K');
     process.stdout.write(`기본 이미지 생성 완료 , 소요시간 ${((perhooks.performance.now() - start) / 1000).toFixed(1)}초\n`);
 
-    let size = [75,58]
+    let size : [number,number] = [75,58];
     if(Spotify_Search.title.length > 14) {
-        size = [67,50]
+        size = [67,50];
     }
 
     const svgText = getSvgText(1000, 1000, 900, size[0], Spotify_Search.title);
     const svgText2 = getSvgText(1000, 1000, 600, size[1], Spotify_Search.artist);
     await sharp(Background_photo)
         .composite([
-            { input: Buffer.from(svgText), left: Math.floor(((config.background_photo.width / 2) / 2) - 500), top: (Math.floor(config.background_photo.height / 2) + 13) },
-            { input: Buffer.from(svgText2), left: Math.floor(((config.background_photo.width / 2) / 2) - 500), top: (Math.floor(config.background_photo.height / 2) + 85) }
+            { input: svgText, left: Math.floor(((config.background_photo.width / 2) / 2) - 500), top: (Math.floor(config.background_photo.height / 2) + 13) },
+            { input: svgText2, left: Math.floor(((config.background_photo.width / 2) / 2) - 500), top: (Math.floor(config.background_photo.height / 2) + 85) }
         ])
         .toFile('temp/Thumbnail_Blur.png');
 }
 
 export async function LyricsImage(config: any, lyrics: any): Promise<void> {
-
-    await fs.rmSync('temp/lyrics', { recursive: true, force: true });
-    await fs.mkdirSync('temp/lyrics', { recursive: true });
-
     const progressBar = new cliProgress.SingleBar({
         format: `{status} |{bar}| {percentage}% | {value}/{total} Chunks`,
     }, cliProgress.Presets.shades_classic);
@@ -78,7 +74,7 @@ export async function LyricsImage(config: any, lyrics: any): Promise<void> {
     progressBar.start(lyrics.length, 0, { status: '가사 이미지 합성 시작중...' });
 
     await sharp("temp/Thumbnail_Blur.png")
-        .composite([{ input: Buffer.from(getSvgText(1500, 1000, 600, 100, "♪")), left: Math.floor((config.background_photo.width / 4 + config.album_cover.width / 2) - 23.5), top: Math.floor(((config.background_photo.height) / 2) - 500) }])
+        .composite([{ input: getSvgText(1500, 1000, 600, 100, "♪"), left: Math.floor((config.background_photo.width / 4 + config.album_cover.width / 2) - 23.5), top: Math.floor(((config.background_photo.height) / 2) - 500) }])
         .toFormat('png')
         .toFile(`temp/lyrics/0.png`);
 
@@ -92,10 +88,8 @@ export async function LyricsImage(config: any, lyrics: any): Promise<void> {
             size = text.length > 17 ? 60 : 70;
         }
 
-        const svgText = getSvgText(1500, 1000, 600, size, text);
-
         await sharp("temp/Thumbnail_Blur.png")
-            .composite([{ input: Buffer.from(svgText), left: Math.floor((config.background_photo.width / 4 + config.album_cover.width / 2) - 23.5), top: Math.floor(((config.background_photo.height) / 2) - 500) }])
+            .composite([{ input: getSvgText(1500, 1000, 600, size, text), left: Math.floor((config.background_photo.width / 4 + config.album_cover.width / 2) - 23.5), top: Math.floor(((config.background_photo.height) / 2) - 500) }])
             .toFormat('png')
             .toFile(`temp/lyrics/${index + 1}.png`);
 
