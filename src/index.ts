@@ -6,14 +6,11 @@ import fs from 'fs-extra';
 let config = require('../config.json');
 
 (async () => {
-    const tracklist = []
-    
-    config.TrackId = "6hnOv3KeFpIwLER7okvLjq"
-
-
-
-
-
+    const TrackList : any = ["4LxFRsy3TZjqAtAgIsjkez"]
+    for (let index = 0; index < TrackList.length; index++) {
+        config.TrackId = TrackList[index];
+        await Run(config);
+    }
 })();
 
 async function Run(config: any) : Promise<void> {
