@@ -18,7 +18,7 @@ async function Run(config: any) : Promise<void> {
 
     const Spotify_Search = await getPreview(config);
     console.info(`트랙를 찾았습니다. : ${Spotify_Search[0].title} - ${Spotify_Search[0].artist}`);
-    console.log(`${Spotify_Search[0].title}(${Spotify_Search[1].title}) - ${Spotify_Search[0].artist}(${Spotify_Search[1].artist}) [가사/lyrics]\n`)
+    console.log(`영문 | ${Spotify_Search[1].title} - ${Spotify_Search[1].artist} [가사/lyrics]\n`)
 
     const Lyrics_Find : any = await getLyrics(config);
     await BasicImage(config, Spotify_Search[0]);
