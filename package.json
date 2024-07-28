@@ -8,6 +8,7 @@
     "start": "node dist/index.j",
     "build": "tsc",
     "watch": "tsc -w",
+    "up" : "node dist/upload.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "김준혁",
