@@ -52,9 +52,13 @@ export async function BasicImage(config: any, Spotify_Search: any): Promise<void
 
     let size : [number,number] = [75,58];
     if(Spotify_Search.title.length > 14) {
-        size = [67,50];
+        size[0] = 67;
     }
 
+    if(Spotify_Search.artist.length >  21) {
+        size[1] = 48;
+    }
+    
     const svgText = getSvgText(1000, 1000, 900, size[0], Spotify_Search.title);
     const svgText2 = getSvgText(1000, 1000, 600, size[1], Spotify_Search.artist);
     await sharp(Background_photo)
@@ -85,7 +89,7 @@ export async function LyricsImage(config: any, lyrics: any): Promise<void> {
         if (text === "♪") {
             size = 100;
         } else {
-            size = text.length > 17 ? 60 : 70;
+            size = text.length > 24 ? 60 : 70;
         }
 
         await sharp("temp/Thumbnail_Blur.png")

@@ -4,7 +4,7 @@ const ffmpeg = require('fluent-ffmpeg');
 
 ffmpeg.setFfmpegPath(ffmpegInstaller.path);
 
-export async function VideoCreation(config: any, lyrics: any): Promise<void> {
+export async function VideoCreation(config: any, lyrics: any , Spotify_Search : any): Promise<void> {
     let LyricsList: any = []
 
     LyricsList.push({ path: `temp/lyrics/0.png`, time: 0 });
@@ -14,7 +14,7 @@ export async function VideoCreation(config: any, lyrics: any): Promise<void> {
     console.info(`비디오 생성을 위한 이미지 불러오기 완료.`);
 
     await BasicVideoCreation(LyricsList);
-    await InsertAudio(config);
+    await InsertAudio(config , Spotify_Search);
 }
 
 async function BasicVideoCreation(LyricsList: any): Promise<void>  {
@@ -50,7 +50,7 @@ async function BasicVideoCreation(LyricsList: any): Promise<void>  {
     });
 }
 
-async function InsertAudio(config : any) : Promise<void> {
+async function InsertAudio(config : any , Spotify_Search : any) : Promise<void> {
     return new Promise<void>((resolve, reject) => {
         const startTime = perhooks.performance.now();
         const spinnerChars = ['|', '/', '-', '\\'];
@@ -73,7 +73,7 @@ async function InsertAudio(config : any) : Promise<void> {
                 process.stdout.write(`\r오디오 합성 완료 , 소요시간 : ${((perhooks.performance.now() - startTime) / 1000).toFixed(1)}초.\n`);
                 resolve();
             })
-            .output(`archive/${config.TrackId}.mp4`)
+            .output(`archive/${Spotify_Search.title}.mp4`)
             .run();
     })
 }

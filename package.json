@@ -6,7 +6,7 @@
   "type": "commonjs",
   "scripts": {
     "start": "node dist/index.j",
-    "build" : "tsc",
+    "build": "tsc",
     "watch": "tsc -w",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -20,7 +20,8 @@
     "node-fetch": "^2.6.1",
     "playwright": "^1.45.3",
     "sharp": "^0.33.4",
-    "spotify-url-info": "^3.2.16"
+    "spotify-url-info": "^3.2.16",
+    "youtube-videos-uploader": "^2.0.26"
   },
   "devDependencies": {
     "@types/fs-extra": "^11.0.4",

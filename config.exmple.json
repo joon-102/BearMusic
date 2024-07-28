@@ -1,4 +1,7 @@
 {
+    "TrackList" : [
+        { "trackid" : "" , "title" : "" , "artist" : "" }
+    ],
     "SpotifyCookie": "",
     "album_cover": {
         "width": 1000,

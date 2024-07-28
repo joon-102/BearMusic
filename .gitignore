@@ -9,7 +9,12 @@ lerna-debug.log*
 
 node_modules
 node_modules/
+archive
+archive/
 dist
+dist/
+yt-auth
+yt-auth/
 temp
 temp/
 dist/
@@ -19,6 +24,7 @@ dist-ssr
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
+src/upload.ts
 .idea
 .DS_Store
 *.suo

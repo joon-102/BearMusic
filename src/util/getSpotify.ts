@@ -37,7 +37,7 @@ export async function getMp3(config: any): Promise<void> {
         "#__next > div > div.mt-5.m-auto.text-center > div.my-5.grid.sm\\:grid-cols-2.gap-4.sm\\:gap-2 > a:nth-child(1)"
     ];
     const start = perhooks.performance.now();
-    const browser = await playwright.chromium.launch({ headless: true });
+    const browser = await playwright.chromium.launch({ headless: false });
     const page = await browser.newPage();
 
     const spinnerChars = ['|', '/', '-', '\\'];
