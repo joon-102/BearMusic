@@ -5,7 +5,7 @@
   "main": "dist/index.js",
   "type": "commonjs",
   "scripts": {
-    "start": "node dist/index.j",
+    "start": "node dist/index.js",
     "build": "tsc",
     "watch": "tsc -w",
     "up" : "node dist/upload.js",
