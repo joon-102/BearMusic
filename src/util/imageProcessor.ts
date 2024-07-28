@@ -3,9 +3,9 @@ const perhooks = require('node:perf_hooks');
 const fetch = require('node-fetch');
 const sharp = require('sharp');
 
-function getSvgText(weight: number, height: number, fontWeight: number, fontSize: number, text: string): Buffer  {
+function getSvgText(weight: number, height: number, fontWeight: number, fontSize: number, text: string): Buffer {
     text = text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&apos;").replace('"', "");
-    const svg : string = `<svg width="${weight - 10}" height="${height - 10}" viewBox="0 0 ${weight} ${height}" xmlns="http://www.w3.org/2000/svg"><defs><style>.title { word-spacing : 0.1px; font-family: 'Pretendard'; font-weight: ${fontWeight}; font-size: ${fontSize}px; fill: white; } </style></defs><text x="50%" y="50%" text-anchor="middle" dy=".3em" class="title">${text}</text></svg>`;
+    const svg: string = `<svg width="${weight - 10}" height="${height - 10}" viewBox="0 0 ${weight} ${height}" xmlns="http://www.w3.org/2000/svg"><defs><style>.title { word-spacing : 0.1px; font-family: 'Pretendard'; font-weight: ${fontWeight}; font-size: ${fontSize}px; fill: white; } </style></defs><text x="50%" y="50%" text-anchor="middle" dy=".3em" class="title">${text}</text></svg>`;
     return Buffer.from(svg);
 }
 
@@ -50,15 +50,15 @@ export async function BasicImage(config: any, Spotify_Search: any): Promise<void
     process.stdout.write('\x1B[1A\x1B[2K');
     process.stdout.write(`기본 이미지 생성 완료 , 소요시간 ${((perhooks.performance.now() - start) / 1000).toFixed(1)}초\n`);
 
-    let size : [number,number] = [75,58];
-    if(Spotify_Search.title.length > 14) {
+    let size: [number, number] = [75, 58];
+    if (Spotify_Search.title.length > 14) {
         size[0] = 67;
     }
 
-    if(Spotify_Search.artist.length >  21) {
+    if (Spotify_Search.artist.length > 21) {
         size[1] = 48;
     }
-    
+
     const svgText = getSvgText(1000, 1000, 900, size[0], Spotify_Search.title);
     const svgText2 = getSvgText(1000, 1000, 600, size[1], Spotify_Search.artist);
     await sharp(Background_photo)
@@ -75,7 +75,7 @@ export async function LyricsImage(config: any, lyrics: any): Promise<void> {
     }, cliProgress.Presets.shades_classic);
 
     const start = perhooks.performance.now();
-    progressBar.start(lyrics.length, 0, { status: '가사 이미지 합성 시작중...' });
+    progressBar.start(lyrics.length + 1, 0, { status: '가사 이미지 합성 시작중...' });
 
     await sharp("temp/Thumbnail_Blur.png")
         .composite([{ input: getSvgText(1500, 1000, 600, 100, "♪"), left: Math.floor((config.background_photo.width / 4 + config.album_cover.width / 2) - 23.5), top: Math.floor(((config.background_photo.height) / 2) - 500) }])
@@ -99,6 +99,12 @@ export async function LyricsImage(config: any, lyrics: any): Promise<void> {
 
         progressBar.update(index + 1, { status: `${index + 1} 번째 이미지 합성 중...` });
     }
+
+    progressBar.update(lyrics.length  + 1, { status: `저용량 섬네일 생성 중...` });
+    sharp("temp/lyrics/0.png")
+        .resize({ width: 800 }) 
+        .jpeg({ quality: 80 }) 
+        .toFile("temp/thumbnail.png");
 
     progressBar.stop();
     process.stdout.write('\x1B[1A\x1B[2K');
