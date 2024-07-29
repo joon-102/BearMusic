@@ -137,8 +137,8 @@ export async function LyricsImage(generateFixedValue: any, lyrics: any , artist 
         } else {
             if (text.length > 24) {
                 lyricsSize = 60;
-            } if (text.length > 34) {
-                lyricsSize = 57;
+            } else if (text.length > 34) {
+                lyricsSize = 56;
             } else {
                 lyricsSize = 70;
             }

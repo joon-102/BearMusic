@@ -25,7 +25,7 @@ async function Run(generateFixedValue: any, config: any, index: number): Promise
     }
 
     await BasicImage(generateFixedValue, Search);
-    await LyricsImage(generateFixedValue, Lyrics.lines, Search.artist);
+    await LyricsImage(generateFixedValue, Lyrics.lines, Search.title);
     await getMp3(config.TrackList[index].trackId);
     await VideoCreation(Lyrics.lines, Search);
 
