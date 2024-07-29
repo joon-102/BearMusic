@@ -1,38 +1,39 @@
-import { getPreview, getLyrics, getMp3 } from './util/getSpotify';
-import { BasicImage, LyricsImage } from './util/imageProcessor';
-import { VideoCreation } from './util/videoProcessor';
-import fs from 'fs-extra';
+import { fetchTrackPreview, getLyrics, getMp3 } from './util/getSpotify.js';
+import { BasicImage, LyricsImage } from './util/imageProcessor.js';
+import { VideoCreation } from './util/videoProcessor.js';
 
-let config = require('../config.json');
+const generateFixedValue = require('../generateFixedValue.json');
+const config = require('../config.json');
 
 (async () => {
-    for (let index = 0; index < config.TrackList.length; index++) {
-        const track = config.TrackList[index];
-        config.TrackId = track.trackid;
-        await Run(config, track);
+    // 생성 리스트 불러오기
+    for (let index: number = 0; index < config.TrackList.length; index++) {
+        await Run(generateFixedValue, config, index);
     }
 })();
 
-async function Run(config: any, track: any): Promise<void> {
-    await fs.emptyDirSync('temp/lyrics');
+async function Run(generateFixedValue: any, config: any, index: number): Promise<void> {
+    let Search = await fetchTrackPreview(config.TrackList[index].trackId, "ko");
+    let Lyrics = await getLyrics(config, index);
 
-    let Spotify_Search = await getPreview(config);
-
-    if (track.title != "") {
-        Spotify_Search[0].title = track.title;
+    if (config.TrackList[index].title != "") {
+        Search.title = config.TrackList[index].title;
     }
 
-    if (track.artist != "") {
-        Spotify_Search[0].artist = track.artist;
+    if (config.TrackList[index].artist != "") {
+        Search.artist = config.TrackList[index].artist;
     }
 
-    Spotify_Search[0].title = Spotify_Search[0].title.replace(/\([^)]*\)/g, '');
+    await BasicImage(generateFixedValue, Search);
+    await LyricsImage(generateFixedValue, Lyrics.lines, Search.artist);
+    await getMp3(config.TrackList[index].trackId);
+    await VideoCreation(Lyrics.lines, Search);
 
-    console.info(`트랙를 찾았습니다. : ${Spotify_Search[0].title} - ${Spotify_Search[0].artist}`);
-    console.log(`영문 | ${Spotify_Search[1].title} - ${Spotify_Search[1].artist} [가사/lyrics]\n`)
-    const Lyrics_Find: any = await getLyrics(config);
-    await BasicImage(config, Spotify_Search[0]);
-    await LyricsImage(config, Lyrics_Find.lines);
-    await getMp3(config);
-    await VideoCreation(config, Lyrics_Find.lines, Spotify_Search[0]);
+    let Search_en = await fetchTrackPreview(config.TrackList[index].trackId, "en");
+    console.log("\n비디오 생성이 완료되었습니다\n")
+    console.table({
+        "곡정보": `${Search.title} - ${Search.artist}`,
+        "영문": `${Search_en.title} - ${Search_en.artist}`,
+        "업로드": `${Search.title}(${Search_en.title}) - ${Search.artist}(${Search_en.artist})  [가사/lyrics]`,
+    });
 }
