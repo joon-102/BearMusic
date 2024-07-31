@@ -1,6 +1,7 @@
 import { fetchTrackPreview, getLyrics, getMp3 } from './util/getSpotify.js';
 import { BasicImage, LyricsImage } from './util/imageProcessor.js';
 import { VideoCreation } from './util/videoProcessor.js';
+import { Videoupload } from './uploade'
 
 const generateFixedValue = require('../generateFixedValue.json');
 const config = require('../config.json');
@@ -36,4 +37,7 @@ async function Run(generateFixedValue: any, config: any, index: number): Promise
         "영문": `${Search_en.title} - ${Search_en.artist}`,
         "업로드": `${Search.title}(${Search_en.title}) - ${Search.artist}(${Search_en.artist})  [가사/lyrics]`,
     });
+
+    await Videoupload(config , { ko : Search , en : Search_en } )
 }
+
