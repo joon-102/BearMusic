@@ -135,15 +135,24 @@ export async function LyricsImage(generateFixedValue: any, lyrics: any , artist 
         if (text === "♪") {
             lyricsSize = 100;
         } else {
-            if (text.length > 24) {
+            lyricsSize = 70;
+            if (text.length >= 24) {
                 lyricsSize = 60;
-            } else if (text.length > 34) {
+            } 
+            if (text.length >= 34) {
                 lyricsSize = 56;
-            } else {
-                lyricsSize = 70;
+            } 
+            if (text.length >= 40) {
+                lyricsSize = 48;
             }
+            if (text.length >= 50) {
+                lyricsSize = 44;
+            }
+            if (text.length >=55) {
+                lyricsSize = 41;
+            }        
         }
-
+    
         await sharp("temp/BasicImag.png")
             .composite([
                 {

@@ -1,6 +1,8 @@
 const perhooks = require('node:perf_hooks');
 const fs = require('node:fs');
+const timers = require('node:timers/promises')
 
+const { fullLists, PlaywrightBlocker } = require( '@cliqz/adblocker-playwright')
 const spotify = require('spotify-url-info');
 const playwright = require('playwright');
 const fetch = require('node-fetch');
@@ -70,11 +72,17 @@ export async function getMp3(TrackId: any): Promise<void> {
         "#__next > div > button",
         "#__next > div > div.mt-5.m-auto.text-center > div.mb-12.grid.grid-cols-1.gap-3.m-auto > div > div.flex.items-center.justify-end > button",
         "#__next > div > div.mt-5.m-auto.text-center > div.my-5.grid.sm\\:grid-cols-2.gap-4.sm\\:gap-2 > a:nth-child(1)"
-    ];
-
+    ]
     const start = perhooks.performance.now();
     const browser = await playwright.chromium.launch({ headless: false });
-    const page = await browser.newPage();
+    const context = await browser.newContext();
+    const page = await context.newPage();
+
+    const blocker = await PlaywrightBlocker.fromLists(fetch, fullLists, {
+        enableCompression: true,
+    });
+
+    await blocker.enableBlockingInPage(page);
 
     const spinnerChars = ['|', '/', '-', '\\'];
     let currentCharIndex = 0;
@@ -95,10 +103,12 @@ export async function getMp3(TrackId: any): Promise<void> {
     await new Promise<void>((resolve, reject) => {
         page.on('download', async (download: any) => {
             try {
-                fs.copyFileSync(await download.path(), "temp/music.mp3");
+                await fs.copyFileSync(await download.path(), "temp/music.mp3");
+                await timers.setTimeout(500);
                 await page.close();
                 resolve();
             } catch (_) {
+                await timers.setTimeout(500);
                 await page.close();
                 reject(_);
             }
