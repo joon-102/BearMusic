@@ -5,7 +5,7 @@ export async function Videoupload(config : any ,  Search: any): Promise<void> {
         config.credentials ,
         [{ 
             path: `archive/${Search.ko.title}.mp4`, 
-            title: `${Search.ko.title}(${Search.en.title}) - ${Search.ko.artist}(${Search.en.artist})  [가사/lyrics]`, 
+            title: `${Search.ko.title}(${Search.en.title}) - ${Search.ko.artist}(${Search.en.artist}) [가사/lyrics]`, 
             description: `${Search.ko.title}(${Search.en.title}) - ${Search.ko.artist}(${Search.en.artist})`, 
             language: 'korean', 
             onSuccess: ()=>{
@@ -13,7 +13,7 @@ export async function Videoupload(config : any ,  Search: any): Promise<void> {
             }, 
             skipProcessingWait: true ,
             publishType: 'PRIVATE', 
-            isNotForKid: false,
+            isNotForKid: true,
             uploadAsDraft: false,
         }], {headless:false} 
     ).then(console.log)
