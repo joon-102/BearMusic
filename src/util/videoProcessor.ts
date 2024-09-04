@@ -79,7 +79,7 @@ async function InsertAudio(Search: any): Promise<void> {
                 process.stdout.write(`\r오디오 합성 완료, 소요시간: ${duration}초.\n`);
                 resolve();
             })
-            .output(`archive/${Search.title}.mp4`)
+            .output(`temp/video.mp4`)
             .run();
     })
 }

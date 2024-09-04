@@ -6,6 +6,7 @@ const fetch = require('node-fetch');
 const sharp = require('sharp');
 
 function generateSvgBuffer(weight: number, height: number, fontWeight: number, fontSize: number, text: string): Buffer {
+    let font: string = 'GmarketSansMedium';
     const escapedText = text
         .replace(/&/g, "&amp;")
         .replace(/</g, "&lt;")
@@ -14,13 +15,15 @@ function generateSvgBuffer(weight: number, height: number, fontWeight: number, f
         .replace(/'/g, "&apos;")
         .replace('"', "");
 
+    if (text == "♪") { font = 'Pretendard'; };
+
     return Buffer.from(`
-        <svg width="${weight - 10}" height="${height - 10}" viewBox="0 0 ${weight} ${height}" xmlns="http://www.w3.org/2000/svg">
+        <svg width="${weight}" height="${height}" viewBox="0 0 ${weight - 10} ${height - 10}" xmlns="http://www.w3.org/2000/svg">
             <defs>
                 <style>
                     .title { 
                         word-spacing: 0.1px; 
-                        font-family: 'Pretendard'; 
+                        font-family: '${font}'; 
                         font-weight: ${fontWeight}; 
                         font-size: ${fontSize}px; 
                         fill: white; 
@@ -82,7 +85,13 @@ export async function BasicImage(generateFixedValue: any, Search: any): Promise<
             {
                 input: Album_Cover,
                 left: Math.floor(generateFixedValue.background_photo.width / 4 - generateFixedValue.album_cover.width / 2),
-                top: Math.floor(generateFixedValue.album_cover.height / 2 - generateFixedValue.background_photo.height / 4),
+                top: Math.floor((generateFixedValue.background_photo.height / 2) - (generateFixedValue.album_cover.height / 2)),
+                blend: 'over'
+            },
+            {
+                input: generateSvgBuffer(250, 100, 600, 35, 'BearMusic'),
+                left: Math.floor(-4),
+                top: Math.floor(-16.5),
                 blend: 'over'
             }
         ])
@@ -94,20 +103,28 @@ export async function BasicImage(generateFixedValue: any, Search: any): Promise<
     const elapsedTime = ((perhooks.performance.now() - start) / 1000).toFixed(1);
     process.stdout.write(`\x1B[1A\x1B[2K기본 이미지 생성 완료 , 소요시간 ${elapsedTime}초\n`)
 
-    let TitleSize: number = 75, ArtistSize: number = 58;
+    let TitleSize: number = 85, ArtistSize: number = 60;
 
     const Title = generateSvgBuffer(2000, 1000, 900, TitleSize, Search.title);
-    const Artist = generateSvgBuffer(1000, 1000, 600, ArtistSize, Search.artist);
+    const Artist = generateSvgBuffer(2000, 1000, 300, ArtistSize, Search.artist);
 
     await sharp(Background_photo)
         .composite([
-            { input: Title, left: Math.floor(((generateFixedValue.background_photo.width / 2) / 2) - 1000), top: (Math.floor(generateFixedValue.background_photo.height / 2) + 13) },
-            { input: Artist, left: Math.floor(((generateFixedValue.background_photo.width / 2) / 2) - 500), top: (Math.floor(generateFixedValue.background_photo.height / 2) + 90) }
+            {
+                input: Title,
+                left: Math.floor(generateFixedValue.background_photo.width / 3),
+                top: Math.floor((generateFixedValue.background_photo.height / 2) - 950) + 65 - 30,
+            },
+            {
+                input: Artist,
+                left: Math.floor(generateFixedValue.background_photo.width / 3),
+                top: Math.floor((generateFixedValue.background_photo.height / 2) - 950) + 95 + 65 - 30,
+            }
         ])
         .toFile('temp/BasicImag.png');
 }
 
-export async function LyricsImage(generateFixedValue: any, lyrics: any , artist : string): Promise<void> {
+export async function LyricsImage(generateFixedValue: any, lyrics: any): Promise<void> {
     const progressBar = new cliProgress.SingleBar({
         format: `{status} |{bar}| {percentage}% | {value}/{total} Chunks`,
     }, cliProgress.Presets.shades_classic);
@@ -121,8 +138,8 @@ export async function LyricsImage(generateFixedValue: any, lyrics: any , artist 
         .composite([
             {
                 input: generateSvgBuffer(1500, 1000, 600, 100, "♪"),
-                left: Math.floor((generateFixedValue.background_photo.width / 4 + generateFixedValue.album_cover.width / 2) - 23.5),
-                top: Math.floor(((generateFixedValue.background_photo.height) / 2) - 500)
+                left: Math.floor((generateFixedValue.background_photo.width / 4 + 1000 / 2) - 45 + 15),
+                top: Math.floor(((generateFixedValue.background_photo.height) / 2) - 470 + 25)
             }
         ])
         .toFormat('png')
@@ -135,31 +152,35 @@ export async function LyricsImage(generateFixedValue: any, lyrics: any , artist 
         if (text === "♪") {
             lyricsSize = 100;
         } else {
-            lyricsSize = 70;
+            lyricsSize = 71;
+            if (text.length >= 15) {
+                lyricsSize = 68;
+            }
             if (text.length >= 24) {
-                lyricsSize = 60;
-            } 
+                lyricsSize = 62;
+            }
             if (text.length >= 34) {
-                lyricsSize = 56;
-            } 
-            if (text.length >= 40) {
-                lyricsSize = 48;
+                lyricsSize = 57;
             }
-            if (text.length >= 50) {
-                lyricsSize = 44;
+            if (text.length >= 44) {
+                lyricsSize = 49;
             }
-            if (text.length >=55) {
-                lyricsSize = 41;
-            }        
+            if (text.length >= 55) {
+                lyricsSize = 45;
+            }
+            if (text.length >= 60) {
+                lyricsSize = 42;
+            }
         }
-    
+
         await sharp("temp/BasicImag.png")
             .composite([
                 {
                     input: generateSvgBuffer(1500, 1000, 600, lyricsSize, text),
-                    left: Math.floor((generateFixedValue.background_photo.width / 4 + generateFixedValue.album_cover.width / 2) - 23.5),
-                    top: Math.floor(((generateFixedValue.background_photo.height) / 2) - 500)
-                }])
+                    left: Math.floor((generateFixedValue.background_photo.width / 4 + 1000 / 2) - 45 + 15),
+                    top: Math.floor(((generateFixedValue.background_photo.height) / 2) - 470 + 25)
+                }
+            ])
             .toFormat('png')
             .toFile(`temp/lyrics/${index + 1}.png`);
 
@@ -170,9 +191,9 @@ export async function LyricsImage(generateFixedValue: any, lyrics: any , artist 
     sharp("temp/lyrics/0.png")
         .resize({ width: 800 })
         .jpeg({ quality: 80 })
-        .toFile(`archive/${artist}.png`);
+        .toFile(`temp/Thumbnail.png`);
 
     progressBar.stop();
     process.stdout.write('\x1B[1A\x1B[2K');
     process.stdout.write(`가사 이미지 합성 완료 , 소요시간 ${((perhooks.performance.now() - start) / 1000).toFixed(1)}초\n`);
-}
+};

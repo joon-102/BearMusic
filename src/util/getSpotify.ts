@@ -15,12 +15,10 @@ export async function fetchTrackPreview(trackId: string, language: string) {
     const previewResponse : any = await spotify(fetch).getPreview(url, options);
     previewResponse.title = previewResponse.title.replace(/\([^)]*\)/g, '');
 
-    console.info(`트랙를 찾았습니다. : ${previewResponse.title} - ${previewResponse.artist}`);
-
     return previewResponse;
 }
 
-export async function getLyrics(config: any , index : number): Promise<{ lines: [time: number, words: string] }> {
+export async function getLyrics(config: any , trackId : string): Promise<{ lines: [time: number, words: string] }> {
     const start = perhooks.performance.now();
     console.info('가사 싱크 다운로드 중...');
 
@@ -43,7 +41,7 @@ export async function getLyrics(config: any , index : number): Promise<{ lines: 
         cachedToken = await tokenResponse.json();
     }
 
-    const lyricsResponse = await fetch(`https://spclient.wg.spotify.com/color-lyrics/v2/track/${encodeURI(config.TrackList[index].trackId)}?format=json&market=from_token`, { 
+    const lyricsResponse = await fetch(`https://spclient.wg.spotify.com/color-lyrics/v2/track/${encodeURI(trackId)}?format=json&market=from_token`, { 
         method: "GET", 
         headers: { 
             "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/101.0.0.0 Safari/537.36", 
