@@ -1,12 +1,12 @@
+const translate = require('translate-google');
+const spotify = require('spotify-url-info');
 const { Command } = require('commander');
 const mongoose = require('mongoose');
-const spotify = require('spotify-url-info');
 const fetch = require('node-fetch');
 
 const config = require('../config.json');
 
 const TrackModel = mongoose.model("Track", new mongoose.Schema({ track: String }));
-const UseModel = mongoose.model("UseTrack", new mongoose.Schema({ track: String }));
 const program = new Command();
 
 program
@@ -47,14 +47,33 @@ const { track, del } = program.opts();
             process.exit(1);
         }
 
-        let Track = await spotify(fetch).getPreview(track, { headers: { 'Accept-Language': `ko` } })
-
-        console.log(`${Track.title} - ${Track.artist}, A song has been added.`)
+        let Track_KR = await spotify(fetch).getPreview(track, { headers: { 'Accept-Language': `ko` } })
+        let Track_EN = await spotify(fetch).getPreview(track, { headers: { 'Accept-Language': `en` } })
+        
+        let koTitle = [Track_KR.title, Track_KR.artist];
+        let enTitle = [Track_EN.title, Track_EN.artist];
+    
+        if (!isEnglish(enTitle[0])) {
+            enTitle = [await translate(Track_EN.title, { to: 'en' }), Track_EN.artist];
+        }
+    
+        if (!isEnglish(enTitle[1])) {
+            enTitle = [Track_EN.title, await translate(Track_EN.artist, { to: 'en' })];
+        }
+    
+        if (isEnglish(koTitle[0])) {
+            koTitle = [await translate(Track_KR.title, { to: 'ko' }), Track_KR.artist];
+        }
+    
+        if (isEnglish(koTitle[1])) {
+            koTitle = [Track_KR.title , await translate(Track_KR.artist, { to: 'ko' }),];
+        }
+        console.log(`${`${koTitle[0]}(${enTitle[0]}) - ${koTitle[1]}(${enTitle[1]})`}, A song has been added.`)
 
         await new TrackModel({ track: TrackID }).save();
         process.exit(1);
     } else if (del) {
-        await new UseModel({ track: del }).save();
+        await TrackModel.deleteMany({ track: del });
         console.log(`${del}, All tracks have been deleted.`)
         process.exit(1);
     } else {
@@ -74,6 +93,11 @@ const { track, del } = program.opts();
         process.exit(1);
     }
 })();
+
+function isEnglish(text) {
+    const englishRegex = /^[A-Za-z\s]+$/;
+    return englishRegex.test(text);
+}
 
 async function connectToDatabase() {
     mongoose.set("strictQuery", false);

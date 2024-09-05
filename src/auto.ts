@@ -1,7 +1,6 @@
 import { spawn } from 'child_process';
 import { Command } from 'commander';
 import mongoose from 'mongoose';
-import cron from 'node-cron';
 
 const config = require('../config.json');
 

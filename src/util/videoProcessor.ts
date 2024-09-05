@@ -21,16 +21,8 @@ export async function VideoCreation(lyrics: any, Search: any): Promise<void> {
 
 async function BasicVideoCreation(LyricsList: { time: number, path: string; }[] ): Promise<void> {
     const startTime = perhooks.performance.now();
-    const spinnerChars = ['|', '/', '-', '\\'];
-    let currentCharIndex = 0;
 
     return new Promise<void>((resolve, reject) => {
-        const updateSpinner = () => {
-            process.stdout.write(`\r${spinnerChars[currentCharIndex]} 비디오 생성중...`);
-            currentCharIndex = (currentCharIndex + 1) % spinnerChars.length;
-        };
-
-        const spinnerInterval = setInterval(updateSpinner, 100);
         const videoCommand = ffmpeg();
 
         LyricsList.forEach((line, index) => {
@@ -38,15 +30,15 @@ async function BasicVideoCreation(LyricsList: { time: number, path: string; }[] 
                 .inputOptions('-loop 1')
                 .inputOptions(`-t ${index < LyricsList.length - 1 ? LyricsList[index + 1].time - line.time : 5}`);
         });
+        
+        console.log('비디오 생성중...');
 
         videoCommand
             .on('error', (err: { message: string; }) => {
-                clearInterval(spinnerInterval);
                 console.error(`비디오 생성 오류: ${err.message}`);
                 reject(err);
             })
             .on('end', () => {
-                clearInterval(spinnerInterval);
                 const duration = ((perhooks.performance.now() - startTime) / 1000).toFixed(1);
                 process.stdout.write(`\r비디오 생성 완료, 소요시간: ${duration}초.\n`);
                 resolve();
@@ -57,8 +49,6 @@ async function BasicVideoCreation(LyricsList: { time: number, path: string; }[] 
 
 async function InsertAudio(Search: any): Promise<void> {
     const startTime = perhooks.performance.now();
-    const spinnerChars = ['|', '/', '-', '\\'];
-    let currentCharIndex = 0;
 
     return new Promise<void>((resolve, reject) => {
         ffmpeg()
@@ -67,8 +57,7 @@ async function InsertAudio(Search: any): Promise<void> {
             .audioCodec('aac')
             .videoCodec('libx264')
             .on('progress', (progress: any) => {
-                process.stdout.write(`\r${spinnerChars[currentCharIndex]} 오디오 합성중... ${Math.floor(progress.percent)}% 완료`);
-                currentCharIndex = (currentCharIndex + 1) % spinnerChars.length;
+                process.stdout.write(`\r오디오 합성중...`); // ${Math.floor(progress.percent)}% 완료`);
             })
             .on('error', (err: any) => {
                 console.error(`오디오 추가 오류: ${err.message}`);

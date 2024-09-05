@@ -81,15 +81,7 @@ export async function getMp3(TrackId: any): Promise<void> {
     });
 
     await blocker.enableBlockingInPage(page);
-
-    const spinnerChars = ['|', '/', '-', '\\'];
-    let currentCharIndex = 0;
-    const updateSpinner = () => {
-        process.stdout.write(`\r${spinnerChars[currentCharIndex]} mp3 다운로드 중...`);
-        currentCharIndex = (currentCharIndex + 1) % spinnerChars.length;
-    };
-
-    const spinnerInterval = setInterval(updateSpinner, 100);
+    process.stdout.write(`\rmp3 다운로드 중...`);
 
     await page.goto("https://spotifydown.com");
     await page.waitForNavigation();
@@ -115,7 +107,6 @@ export async function getMp3(TrackId: any): Promise<void> {
         page.click(contents[3]).catch(reject);
     });
 
-    clearInterval(spinnerInterval);
     await browser.close();
 
     const elapsedTime = ((perhooks.performance.now() - start) / 1000).toFixed(1);
