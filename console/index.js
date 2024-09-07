@@ -7,6 +7,7 @@ const fetch = require('node-fetch');
 const config = require('../config.json');
 
 const TrackModel = mongoose.model("Track", new mongoose.Schema({ track: String }));
+const UseModel = mongoose.model("UseTrack", new mongoose.Schema({ track: String }));
 const program = new Command();
 
 program
@@ -41,8 +42,9 @@ const { track, del } = program.opts();
         }
 
         const TrackFind = await TrackModel.findOne({ track: TrackID });
+        const UseFind = await UseModel.findOne({ track: TrackID });
 
-        if (TrackFind) {
+        if (TrackFind || UseFind) {
             console.log('The song is already registered.')
             process.exit(1);
         }

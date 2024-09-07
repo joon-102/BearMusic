@@ -1,0 +1,8 @@
+{
+    "credentials": {
+        "email": "google account email",
+        "pass": "google account pass"
+    },
+    "SpotifyCookie": "SpotifyCookie sp_dc cookie",
+    "mongo": "mongodb srv URL"
+}

@@ -98,10 +98,7 @@ export async function BasicImage(generateFixedValue: any, Search: any): Promise<
         .toFormat('png')
         .toBuffer();
 
-    progressBar.stop();
 
-    const elapsedTime = ((perhooks.performance.now() - start) / 1000).toFixed(1);
-    process.stdout.write(`\x1B[1A\x1B[2K기본 이미지 생성 완료 , 소요시간 ${elapsedTime}초\n`)
 
     let TitleSize: number = 85, ArtistSize: number = 60;
 
@@ -122,6 +119,31 @@ export async function BasicImage(generateFixedValue: any, Search: any): Promise<
             }
         ])
         .toFile('temp/BasicImag.png');
+
+
+    // await sharp(Background_photo)
+    //     .composite([
+    //         {
+    //             input: Title,
+    //             left: Math.floor(generateFixedValue.background_photo.width / 3),
+    //             top: Math.floor((generateFixedValue.background_photo.height / 2) - 500) - 35 ,
+    //         },
+    //         {
+    //             input: Artist,
+    //             left: Math.floor(generateFixedValue.background_photo.width / 3),
+    //             top: Math.floor((generateFixedValue.background_photo.height / 2) - 500) + 100 - 35,
+    //         }
+    //     ])
+    //     .toFormat('png')
+    //     .jpeg({ quality: 80 })
+    //     .resize({ with : 80 })
+    //     .toFile(`temp/Thumbnail.jpg`);
+
+    progressBar.stop();
+
+    const elapsedTime = ((perhooks.performance.now() - start) / 1000).toFixed(1);
+    process.stdout.write(`\x1B[1A\x1B[2K기본 이미지 생성 완료 , 소요시간 ${elapsedTime}초\n`)
+
 }
 
 export async function LyricsImage(generateFixedValue: any, lyrics: any): Promise<void> {
@@ -132,7 +154,7 @@ export async function LyricsImage(generateFixedValue: any, lyrics: any): Promise
     await fs.emptyDirSync('temp/lyrics');
 
     const start = perhooks.performance.now();
-    progressBar.start(lyrics.length + 1, 0, { status: '가사 이미지 합성 시작중...' });
+    progressBar.start(lyrics.length, 0, { status: '가사 이미지 합성 시작중...' });
 
     await sharp("temp/BasicImag.png")
         .composite([
@@ -186,12 +208,6 @@ export async function LyricsImage(generateFixedValue: any, lyrics: any): Promise
 
         progressBar.update(index + 1, { status: `${index + 1} 번째 이미지 합성 중...` });
     }
-
-    progressBar.update(lyrics.length + 1, { status: `저용량 섬네일 생성 중...` });
-    sharp("temp/lyrics/0.png")
-        .resize({ width: 800 })
-        .jpeg({ quality: 80 })
-        .toFile(`temp/Thumbnail.png`);
 
     progressBar.stop();
     process.stdout.write('\x1B[1A\x1B[2K');

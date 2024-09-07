@@ -1,4 +1,4 @@
-const { upload } = require('youtube-videos-uploader');
+const { upload , update } = require('youtube-videos-uploader');
 const translate = require('translate-google');
 
 function isEnglish(text: string) {
@@ -35,10 +35,11 @@ export async function Videoupload(config: any, Search: any , track : any): Promi
         language: 'korean',
         onSuccess: () => console.log(`업로드 성공!`),
         skipProcessingWait: true,
-        publishType: 'PUBLIC',
+        publishType: 'PRIVATE',
         isNotForKid: true,
         uploadAsDraft: false,
     }]
 
     await upload(config.credentials, input, { headless: false }).then(console.log);
 };
+
