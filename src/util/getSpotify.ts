@@ -2,7 +2,7 @@ const perhooks = require('node:perf_hooks');
 const fs = require('node:fs');
 const timers = require('node:timers/promises')
 
-const { fullLists, PlaywrightBlocker } = require( '@cliqz/adblocker-playwright')
+const { fullLists, PlaywrightBlocker } = require('@cliqz/adblocker-playwright')
 const spotify = require('spotify-url-info');
 const playwright = require('playwright');
 const fetch = require('node-fetch');
@@ -12,26 +12,26 @@ export async function fetchTrackPreview(trackId: string, language: string) {
     const options = {
         headers: { 'Accept-Language': `${language}` }
     };
-    const previewResponse : any = await spotify(fetch).getPreview(url, options);
+    const previewResponse: any = await spotify(fetch).getPreview(url, options);
     previewResponse.title = previewResponse.title.replace(/\([^)]*\)/g, '');
 
     return previewResponse;
 }
 
-export async function getLyrics(config: any , trackId : string): Promise<{ lines: [time: number, words: string] }> {
+export async function getLyrics(config: any, trackId: string): Promise<{ lines: [time: number, words: string] }> {
     const start = perhooks.performance.now();
     console.info('가사 싱크 다운로드 중...');
 
     let cachedToken: any = null;
 
     if (!(cachedToken && (cachedToken.accessTokenExpirationTimestampMs > Date.now()))) {
-        const tokenResponse  = await fetch("https://open.spotify.com/get_access_token?reason=transport&productType=web_player", { 
-            headers: { 
-                "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/101.0.0.0 Safari/537.36", 
-                "App-platform": "WebPlayer", 
-                "content-type": "text/html; charset=utf-8", 
-                cookie: `sp_dc=${config.SpotifyCookie}` 
-            } 
+        const tokenResponse = await fetch("https://open.spotify.com/get_access_token?reason=transport&productType=web_player", {
+            headers: {
+                "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/101.0.0.0 Safari/537.36",
+                "App-platform": "WebPlayer",
+                "content-type": "text/html; charset=utf-8",
+                cookie: `sp_dc=${config.SpotifyCookie}`
+            }
         });
 
         if (!tokenResponse.ok) {
@@ -41,25 +41,25 @@ export async function getLyrics(config: any , trackId : string): Promise<{ lines
         cachedToken = await tokenResponse.json();
     }
 
-    const lyricsResponse = await fetch(`https://spclient.wg.spotify.com/color-lyrics/v2/track/${encodeURI(trackId)}?format=json&market=from_token`, { 
-        method: "GET", 
-        headers: { 
-            "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/101.0.0.0 Safari/537.36", 
-            "App-platform": "WebPlayer", 
-            "authorization": `Bearer ${cachedToken.accessToken}` 
-        } 
+    const lyricsResponse = await fetch(`https://spclient.wg.spotify.com/color-lyrics/v2/track/${encodeURI(trackId)}?format=json&market=from_token`, {
+        method: "GET",
+        headers: {
+            "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/101.0.0.0 Safari/537.36",
+            "App-platform": "WebPlayer",
+            "authorization": `Bearer ${cachedToken.accessToken}`
+        }
     });
 
-    const data : any = await lyricsResponse.json();
+    const data: any = await lyricsResponse.json();
 
     const elapsedTime = ((perhooks.performance.now() - start) / 1000).toFixed(1);
     process.stdout.write(`\x1B[1A\x1B[2K가사 싱크 다운로드 완료 , 소요시간 ${elapsedTime}초\n`);
 
 
-    return { 
-        lines: data.lyrics.lines.map((value: { words: any , startTimeMs: any }) => ({ 
-            words: value.words, 
-            time: Number(value.startTimeMs) 
+    return {
+        lines: data.lyrics.lines.map((value: { words: any, startTimeMs: any }) => ({
+            words: value.words,
+            time: Number(value.startTimeMs)
         })),
     };
 }
@@ -90,21 +90,21 @@ export async function getMp3(TrackId: any): Promise<void> {
     await page.click(contents[2]);
     await page.locator(contents[3]).waitFor({ state: 'visible' });
 
-    await new Promise<void>((resolve, reject) => {
-        page.on('download', async (download: any) => {
+    await new Promise<void>(async (resolve, reject) => {
+        await page.on('download', async (download: any) => {
             try {
                 await fs.copyFileSync(await download.path(), "temp/music.mp3");
-                await timers.setTimeout(500);
+                await timers.setTimeout(2000);
                 await page.close();
                 resolve();
             } catch (_) {
-                await timers.setTimeout(500);
+                await timers.setTimeout(2000);
                 await page.close();
                 reject(_);
             }
         });
 
-        page.click(contents[3]).catch(reject);
+        await page.click(contents[3]).catch(reject);
     });
 
     await browser.close();
