@@ -64,6 +64,7 @@ export async function getLyrics(config: any, trackId: string): Promise<{ lines: 
     };
 }
 
+
 export async function getMp3(TrackId: any): Promise<void> {
     const contents = [
         "#__next > div > div.relative > input",
@@ -90,21 +91,21 @@ export async function getMp3(TrackId: any): Promise<void> {
     await page.click(contents[2]);
     await page.locator(contents[3]).waitFor({ state: 'visible' });
 
-    await new Promise<void>(async (resolve, reject) => {
-        await page.on('download', async (download: any) => {
+    await new Promise<void>((resolve, reject) => {
+        page.on('download', async (download: any) => {
             try {
                 await fs.copyFileSync(await download.path(), "temp/music.mp3");
-                await timers.setTimeout(2000);
+                await timers.setTimeout(500);
                 await page.close();
                 resolve();
             } catch (_) {
-                await timers.setTimeout(2000);
+                await timers.setTimeout(500);
                 await page.close();
                 reject(_);
             }
         });
 
-        await page.click(contents[3]).catch(reject);
+        page.click(contents[3]).catch(reject);
     });
 
     await browser.close();

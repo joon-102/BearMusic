@@ -76,6 +76,7 @@ const { track, del } = program.opts();
         process.exit(1);
     } else if (del) {
         await TrackModel.deleteMany({ track: del });
+        await UseModel.deleteMany({ track: del });
         console.log(`${del}, All tracks have been deleted.`)
         process.exit(1);
     } else {

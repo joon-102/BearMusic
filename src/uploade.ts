@@ -1,4 +1,4 @@
-const { upload , update } = require('youtube-videos-uploader');
+const { upload } = require('youtube-videos-uploader');
 const translate = require('translate-google');
 
 function isEnglish(text: string) {
@@ -6,7 +6,7 @@ function isEnglish(text: string) {
     return englishRegex.test(text);
 }
 
-export async function Videoupload(config: any, Search: any , track : any): Promise<void> {
+export async function Videoupload(config: any, Search: any, track: any): Promise<void> {
     let koTitle = [Search.ko.title, Search.ko.artist];
     let enTitle = [Search.en.title, Search.en.artist];
 
@@ -23,7 +23,7 @@ export async function Videoupload(config: any, Search: any , track : any): Promi
     }
 
     if (isEnglish(koTitle[1])) {
-        koTitle = [Search.ko.title , await translate(Search.ko.artist, { to: 'ko' }),];
+        koTitle = [Search.ko.title, await translate(Search.ko.artist, { to: 'ko' })];
     }
 
     let title = `${koTitle[0]}(${enTitle[0]}) - ${koTitle[1]}(${enTitle[1]})`;
@@ -35,7 +35,7 @@ export async function Videoupload(config: any, Search: any , track : any): Promi
         language: 'korean',
         onSuccess: () => console.log(`업로드 성공!`),
         skipProcessingWait: true,
-        publishType: 'PRIVATE',
+        publishType: 'PUBLIC',
         isNotForKid: true,
         uploadAsDraft: false,
     }]

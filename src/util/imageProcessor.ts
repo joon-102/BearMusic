@@ -5,7 +5,7 @@ const cliProgress = require('cli-progress');
 const fetch = require('node-fetch');
 const sharp = require('sharp');
 
-function generateSvgBuffer(weight: number, height: number, fontWeight: number, fontSize: number, text: string): Buffer {
+function generateSvgBuffer(weight: number, height: number, fontWeight: number, fontSize: number, text: string , color : string  = 'white'): Buffer {
     let font: string = 'GmarketSansMedium';
     const escapedText = text
         .replace(/&/g, "&amp;")
@@ -26,7 +26,7 @@ function generateSvgBuffer(weight: number, height: number, fontWeight: number, f
                         font-family: '${font}'; 
                         font-weight: ${fontWeight}; 
                         font-size: ${fontSize}px; 
-                        fill: white; 
+                        fill: ${color}; 
                     } 
                 </style>
             </defs>
@@ -34,6 +34,33 @@ function generateSvgBuffer(weight: number, height: number, fontWeight: number, f
         </svg>
     `);
 }
+
+function getLyricsSize(text: string): number {
+    if (text === "♪") {
+        return 100;
+    }
+
+    const sizeMap = [
+        { length: 60, size: 38 },
+        { length: 55, size: 42 },
+        { length: 44, size: 48 },
+        { length: 34, size: 57 },
+        { length: 24, size: 62 },
+        { length: 15, size: 68 },
+    ];
+
+    let lyricsSize = 71; 
+
+    for (const item of sizeMap) {
+        if (text.length >= item.length) {
+            lyricsSize = item.size;
+            break;
+        }
+    }
+
+    return lyricsSize;
+}
+
 
 export async function BasicImage(generateFixedValue: any, Search: any): Promise<void> {
 
@@ -169,40 +196,29 @@ export async function LyricsImage(generateFixedValue: any, lyrics: any): Promise
 
     for (let index = 0; index < lyrics.length; index++) {
         const text = lyrics[index].words || "♪";
-        let lyricsSize: number;
+        const NextText = (lyrics[index + 1]?.words || "♪") || "";
 
-        if (text === "♪") {
-            lyricsSize = 100;
-        } else {
-            lyricsSize = 71;
-            if (text.length >= 15) {
-                lyricsSize = 68;
+        let lyricsSize: number = getLyricsSize(text);
+        let nextSize:number = getLyricsSize(NextText) - 15;
+
+        let composite = [
+            {
+                input: generateSvgBuffer(1500, 1000, 600, lyricsSize, text),
+                left: Math.floor((generateFixedValue.background_photo.width / 4 + 1000 / 2) - 45 + 15),
+                top: Math.floor(((generateFixedValue.background_photo.height) / 2) - 470 + 25)
             }
-            if (text.length >= 24) {
-                lyricsSize = 62;
-            }
-            if (text.length >= 34) {
-                lyricsSize = 57;
-            }
-            if (text.length >= 44) {
-                lyricsSize = 49;
-            }
-            if (text.length >= 55) {
-                lyricsSize = 45;
-            }
-            if (text.length >= 60) {
-                lyricsSize = 42;
-            }
+        ]
+
+        if(lyrics[index + 1]) {
+            composite.push({
+                input: generateSvgBuffer(1500, 1000, 600, nextSize, NextText , '#A4A4A4'),
+                left: Math.floor((generateFixedValue.background_photo.width / 4 + 1000 / 2) - 45 + 15),
+                top: Math.floor(((generateFixedValue.background_photo.height) / 2) - 470 + 25 + 120)
+            })
         }
 
         await sharp("temp/BasicImag.png")
-            .composite([
-                {
-                    input: generateSvgBuffer(1500, 1000, 600, lyricsSize, text),
-                    left: Math.floor((generateFixedValue.background_photo.width / 4 + 1000 / 2) - 45 + 15),
-                    top: Math.floor(((generateFixedValue.background_photo.height) / 2) - 470 + 25)
-                }
-            ])
+            .composite(composite)
             .toFormat('png')
             .toFile(`temp/lyrics/${index + 1}.png`);
 
