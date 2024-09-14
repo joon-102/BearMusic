@@ -66,10 +66,20 @@ async function makeVideo(track: string): Promise<boolean> {
 
         const track = PlayList[0].track;
 
-        await makeVideo(track);
+        const ProductionResults = await makeVideo(track);
 
-        await Track.deleteMany({ track: track });
-        await new Use({ track: track }).save();
+        if(ProductionResults) {
+            await Track.deleteMany({ track: track });
+            await new Use({ track: track }).save();
+        } else {
+            if(PlayList[1]) {
+                await makeVideo(track);
+
+                await Track.deleteMany({ track: track });
+                await new Use({ track: track }).save();
+            }
+        }
+       
     }
 
     await start()

@@ -7,7 +7,7 @@
   "scripts": {
     "start": "node dist/index.js",
     "build": "tsc",
-    "auto" : "node dist/auto.js",
+    "auto": "node dist/auto.js",
     "watch": "tsc -w",
     "up": "node dist/upload.js",
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -29,7 +29,8 @@
     "sharp": "^0.33.4",
     "spotify-url-info": "^3.2.16",
     "translate-google": "^1.5.0",
-    "youtube-videos-uploader": "^2.0.26"
+    "youtube-videos-uploader": "^2.0.26",
+    "youtube-videos-uploader-ichiin": "^2.0.27"
   },
   "devDependencies": {
     "@types/fs-extra": "^11.0.4",

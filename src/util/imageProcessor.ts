@@ -199,7 +199,7 @@ export async function LyricsImage(generateFixedValue: any, lyrics: any): Promise
         const NextText = (lyrics[index + 1]?.words || "♪") || "";
 
         let lyricsSize: number = getLyricsSize(text);
-        let nextSize:number = getLyricsSize(NextText) - 15;
+        let nextSize:number = getLyricsSize(NextText) - 17;
 
         let composite = [
             {
