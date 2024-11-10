@@ -3,39 +3,22 @@
   "version": "0.0.1",
   "description": "youtube lyrics video make",
   "main": "dist/index.js",
-  "type": "commonjs",
   "scripts": {
-    "start": "node dist/index.js",
-    "build": "tsc",
-    "auto": "node dist/auto.js",
-    "watch": "tsc -w",
-    "up": "node dist/upload.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node -r tsconfig-paths/register dist/index.js",
+    "watch": "tsc -w"
   },
   "author": "김준혁",
   "license": "Apache-2.0",
   "dependencies": {
-    "@cliqz/adblocker-playwright": "^1.30.1",
-    "@ffmpeg-installer/ffmpeg": "^1.1.0",
-    "child_process": "^1.0.2",
-    "cli-progress": "^3.12.0",
+    "axios": "^1.7.7",
+    "canvas": "^2.11.2",
+    "cheerio": "^1.0.0",
     "commander": "^12.1.0",
-    "fluent-ffmpeg": "^2.1.3",
-    "fs-extra": "^11.2.0",
-    "mongoose": "^8.6.0",
-    "node-cron": "^3.0.3",
-    "node-fetch": "^2.6.1",
-    "playwright": "^1.45.3",
-    "sharp": "^0.33.4",
-    "spotify-url-info": "^3.2.16",
-    "translate-google": "^1.5.0",
-    "youtube-videos-uploader": "^2.0.26",
-    "youtube-videos-uploader-ichiin": "^2.0.27"
+    "dotenv": "^16.4.5",
+    "mongoose": "^8.8.1"
   },
   "devDependencies": {
-    "@types/fs-extra": "^11.0.4",
-    "@types/node": "^20.14.11",
-    "@types/node-cron": "^3.0.11",
-    "@types/node-fetch": "^2.6.11"
+    "@types/cheerio": "^0.22.35",
+    "@types/node": "^20.14.11"
   }
 }
