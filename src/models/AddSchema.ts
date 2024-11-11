@@ -18,5 +18,5 @@ const AddSchema = new mongoose.Schema(
     }
 );
 
-export = mongoose.model("playlist", AddSchema);
+export = mongoose.model("Add", AddSchema);
 
