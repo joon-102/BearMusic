@@ -37,9 +37,6 @@ export class imageService {
                 endColor: (contrast1 > contrast2 ? endColor : startColor)
             };
         }
-        return null
+        return null;
     }
-
-
-
 };

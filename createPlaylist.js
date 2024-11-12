@@ -30,7 +30,7 @@ const INTERVAL = 120000;
 (async () => {
 
     await mongoose.connect(process.env.MONGO_URI);
-    let previousData = (await getNewestChart()).splice(2);
+    let previousData = await getNewestChart();
 
     console.log(`${INTERVAL / 1000}초 마다 차트 데이터를 가져옵니다.`);
 
