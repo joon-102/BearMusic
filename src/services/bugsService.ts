@@ -4,6 +4,7 @@ import * as cheerio from 'cheerio';
 export class bugsService {
 
     async getNewestChart(): Promise<{ title: string; artist: string; imgSrc?: string; trackId?: number; artistId?: number; albumId?: number; }[]> {
+
         const request: AxiosResponse<string> = await axios.get<string>('https://music.bugs.co.kr/newest/track/totalpicked?nation=ALL');
         const $: cheerio.Root = cheerio.load(request.data);
         const tracks: any[] = [];
@@ -25,6 +26,7 @@ export class bugsService {
     };
 
     async getSinklyrics(trackId: number): Promise<{ time: number; lyrics: string }[] | null> {
+
         const request: AxiosResponse<{ lyrics: string }> = await axios.get<{ lyrics: string }>(`https://music.bugs.co.kr/player/lyrics/T/${trackId}`);
 
         if (request.data.lyrics === '') return null;
@@ -37,15 +39,18 @@ export class bugsService {
         return processing;
     };
 
-    async getTrackInfo(trackId: number): Promise<any> {
+    async getTrackInfo(trackId: number): Promise<{ track: string, artist: string, trackId: number, albumId: number, album: string, release: string, imgSrc: string }> {
+
         const request: AxiosResponse<{ track: any }> = await axios.get<any>(`https://music.bugs.co.kr/player/track/${trackId}`);
 
         return {
             track: request.data.track.track_title.replace(/\([^()]*\)/g, '').replace(/\([^()]*\)/g, '').trim(),
             artist: request.data.track.artist_disp_nm.replace(/\([^()]*\)/g, '').replace(/\([^()]*\)/g, '').trim(),
+            trackId: request.data.track.track_id,
+            albumId: request.data.track.album_id,
             album: request.data.track.album_title.replace(/\([^()]*\)/g, '').trim(),
             release: request.data.track.release_ymd,
+            imgSrc: `https://image.bugsm.co.kr/album/images/original/${String(request.data.track.album_id).slice(0, -2)}/${request.data.track.album_id}.jpg`
         };
     };
 };
-
