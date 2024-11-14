@@ -10,4 +10,3 @@ const TrashSchema = new mongoose.Schema(
 );
 
 export = mongoose.model("Trash", TrashSchema);
-

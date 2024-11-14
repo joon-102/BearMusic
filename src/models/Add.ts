@@ -10,13 +10,9 @@ const AddSchema = new mongoose.Schema(
         trackId: { type: String, required: true },
         albumId: { type: String, required: true },
         lyrics: [
-            {
-                time: { type: Number, required: true },
-                lyrics: { type: String, required: true },
-            },
+            { time: { type: Number, required: true }, lyrics: { type: String, required: true } },
         ],
     }
 );
 
 export = mongoose.model("Add", AddSchema);
-
