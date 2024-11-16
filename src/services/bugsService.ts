@@ -43,7 +43,7 @@ export class bugsService {
 
         const request: AxiosResponse<{ track: any }> = await axios.get<any>(`https://music.bugs.co.kr/player/track/${trackId}`);
 
-        if(!request.data.track.track_title) return null;
+        if(!request.data.track) return null;
 
         return {
             track: request.data.track.track_title.replace(/\([^()]*\)/g, '').replace(/\([^()]*\)/g, '').trim(),
