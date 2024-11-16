@@ -11,6 +11,8 @@ node_modules
 node_modules/
 archive
 archive/
+out
+out/
 dist
 dist/
 yt-auth
