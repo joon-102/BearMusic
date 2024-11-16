@@ -48,8 +48,6 @@ export class audioService {
     async downloadYouTubeAsMP3(videoId: string, fileName: string): Promise<boolean> {
         const outputPath = `./out/${fileName}.%(ext)s`
 
-        console.log(`https://www.youtube.com/watch?v=${videoId}`)
-
         try {
             await exec(`https://www.youtube.com/watch?v=${videoId}`, {
                 extractAudio: true,
