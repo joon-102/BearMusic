@@ -19,6 +19,7 @@
     "sharp": "^0.33.5",
     "tmp": "^0.2.3",
     "youtube-dl-exec": "^3.0.10",
+    "youtube-videos-uploader": "^2.0.26",
     "ytdl-core": "^4.11.5"
   },
   "devDependencies": {
