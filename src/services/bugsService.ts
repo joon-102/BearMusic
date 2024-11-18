@@ -2,6 +2,11 @@ import axios, { AxiosResponse } from 'axios';
 import * as cheerio from 'cheerio';
 
 export class bugsService {
+    app: any;
+
+    constructor(client: any) {
+        this.app = client;
+    }
 
     async getNewestChart(): Promise<{ title: string; artist: string; imgSrc?: string; trackId?: number; artistId?: number; albumId?: number; }[]> {
 
@@ -39,15 +44,17 @@ export class bugsService {
         return processing;
     };
 
-    async getTrackInfo(trackId: number): Promise<{ track: string, artist: string, trackId: number, albumId: number, album: string, release: string, imgSrc: string } | null> {
+    async getTrackInfo(trackId: number): Promise<{ rawTrack: string, rawArtist: string, track: string, artist: string, trackId: number, albumId: number, album: string, release: string, imgSrc: string } | null> {
 
         const request: AxiosResponse<{ track: any }> = await axios.get<any>(`https://music.bugs.co.kr/player/track/${trackId}`);
 
-        if(!request.data.track) return null;
-    
-        console.debug(`  >> [${request.data.track.track_title} - ${request.data.track.artist_disp_nm}] - Find Track`)
+        if (!request.data.track) return null;
+
+        this.app.debug(`  >> [ ${request.data.track.track_title} - ${request.data.track.artist_disp_nm} ] - Find Track`);
 
         return {
+            rawTrack: request.data.track.track_title,
+            rawArtist: request.data.track.artist_disp_nm,
             track: request.data.track.track_title.replace(/\([^()]*\)/g, '').replace(/\([^()]*\)/g, '').trim(),
             artist: request.data.track.artist_disp_nm.replace(/\([^()]*\)/g, '').replace(/\([^()]*\)/g, '').trim(),
             trackId: request.data.track.track_id,
