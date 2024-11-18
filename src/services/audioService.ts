@@ -21,9 +21,9 @@ export class audioService {
         const response: AxiosResponse<{ items: any }> = await axios.get('https://www.googleapis.com/youtube/v3/search', {
             params: {
                 part: 'snippet',
-                q: `${request.data.track.track_title} - ${request.data.track.artist_disp_nm} Auto-generated`,
+                q: `"${request.data.track.track_title}" - ${request.data.track.artist_disp_nm} "Auto-generated"`,
                 type: 'video',
-                maxResults: 3,
+                maxResults: 4,
                 key: process.env.YOUTUBE_API_KEY
             }
         });
