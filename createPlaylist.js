@@ -83,7 +83,7 @@ const INTERVAL = 120000;
 })();
 
 const getNewestChart = async () => {
-    const response = await axios.get('https://music.bugs.co.kr/newest/track/kpoppicked');
+    const response = await axios.get('https://music.bugs.co.kr/newest/track/totalpicked?nation=ALL');
     const $ = cheerio.load(response.data);
     const tracks = [];
 
@@ -99,7 +99,7 @@ const getNewestChart = async () => {
             tracks.push({ title, artist, trackId, artistId, imgSrc, albumId });
         }
     });
-
+    
     return tracks;
 };
 
