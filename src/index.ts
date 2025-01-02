@@ -31,15 +31,16 @@ class BearMusic {
 
     async system(message: string) {
         console.debug("\x1b[34m%s\x1b[0m", `[ SYSTEM ] ${message}`);
-    }    
+    }
 
     async uploadToYouTube(videoPath: string): Promise<{ code: string, path: string, error?: string }> {
         try {
             let isSuccess: boolean = false;
+            const tag = "#" + ['가사', '베어뮤직', 'BearMusic', this.trackInfo?.rawTrack.replace(/[^a-zA-Z0-9가-힣\s]/g, ''), this.trackInfo?.rawArtist.replace(/[^a-zA-Z0-9가-힣\s]/g, ''), this.trackInfo?.album.replace(/[^a-zA-Z0-9가-힣\s]/g, '')].join('#');
             const video = [{
                 path: videoPath,
                 title: `${this.trackInfo?.rawTrack} - ${this.trackInfo?.rawArtist} | [가사/lyrics] `,
-                description: `🎶 본 영상은 가사 자막 영상입니다, 수익 창출은 되지 않습니다.\n\n🎧 Title : ${this.trackInfo?.rawTrack}\n🎤 Artist : ${this.trackInfo?.rawArtist}\n💿 Album : ${this.trackInfo?.album}\n📅 Release : ${this.trackInfo?.release.replace(/^(\d{4})(\d{2})(\d{2})$/, '$1년$2월$3일')}\n\n✨ Made by BearMusic`,
+                description: `🎶 본 영상은 가사 자막 영상입니다, 수익 창출은 되지 않습니다.\n\n🎧 Title : ${this.trackInfo?.rawTrack.replace(/[^a-zA-Z0-9가-힣\s]/g, '')}\n🎤 Artist : ${this.trackInfo?.rawArtist}\n💿 Album : ${this.trackInfo?.album.replace(/[^a-zA-Z0-9가-힣\s]/g, '')}\n📅 Release : ${this.trackInfo?.release.replace(/^(\d{4})(\d{2})(\d{2})$/, '$1년$2월$3일')}\n\n✨ Made by BearMusic\n\n${tag}`,
                 language: 'korean',
                 onSuccess: () => { isSuccess = true },
                 skipProcessingWait: true,
@@ -169,7 +170,7 @@ class BearMusic {
                 }).save();
 
                 app.system("비디오를 성공적으로 업로드 하였습니다. 1시간 뒤 프로세스를 반복합니다.");
-                app.system(`업로드 정보\n🔗 Youtube : ${upload.path}\n🎧 Title : ${app.trackInfo?.rawTrack}\n🎤 Artist : ${app.trackInfo?.rawArtist}\n💿 Album : ${app.trackInfo?.album}\n📅 Release : ${app.trackInfo?.release.replace(/^(\d{4})(\d{2})(\d{2})$/,"$1년$2월$3일")}`);
+                app.system(`업로드 정보\n🔗 Youtube : ${upload.path}\n🎧 Title : ${app.trackInfo?.rawTrack}\n🎤 Artist : ${app.trackInfo?.rawArtist}\n💿 Album : ${app.trackInfo?.album}\n📅 Release : ${app.trackInfo?.release.replace(/^(\d{4})(\d{2})(\d{2})$/, "$1년$2월$3일")}`);
                 Timeout = 1000 * 60 * 60;
             }
         } catch (error) {
