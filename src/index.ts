@@ -104,6 +104,7 @@ class BearMusic {
             this.debug("BearMusic successfully launched")
             return { code: 'SUCCESS_VIDEO_CREATED', path: `out/${trackInfo.track} - ${trackInfo.artist}.mp4` }
         } catch (error) {
+            console.error(error)
             return { code: 'ERR_VIDEO_NOT_GENERATION', path: `` }
         }
     }
@@ -113,49 +114,73 @@ class BearMusic {
     dotenv.config();
     mongoose.connect(String(process.env.MONGO_URI));
 
-    while (true) {
-        const app = new BearMusic()
+    const app = new BearMusic();
 
+    const processLoop = async () => {
         let Timeout = 1000 * 60 * 30;
-        const playlist = await Add.find().exec();
 
-        if (playlist.length <= 0) return Timeout = 1000 * 60;
-        const track = Number(playlist[0].trackId);
+        try {
+            const playlist = await Add.find().exec();
 
-        const video = await app.createVideoTrack(track);
-
-        if (video.code == "ERR_VIDEO_NOT_GENERATION") {
-            app.system(`ERR 알 수 없는 이유로 비디오를 생성하지 못했습니다. 30분 뒤 다시 시도합니다..\n`)
-            return Timeout = 1000 * 60 * 30;
-        }
-
-        if (video.code == "ERR_VIDEO_NOT_FOUND") {
-            app.system(`ERR YT 비디오를 찾지 못했습니다.\n`)
-            return Timeout = 1000 * 60;
-        }
-
-        if (video.code == "ERR_LYRICS_NOT_FOUND") {
-            app.system(`ERR 싱크 가사가 등록되어 있지 않습니다.\n`)
-            return Timeout = 1000 * 60;
-        }
-
-        if (video.code == "SUCCESS_VIDEO_CREATED") {
-            app.system(`비디오가 성공적으로 생성되었습니다.\n`)
-
-            const upload = await app.uploadToYouTube(video.path);
-
-            if (upload.code == 'ERR_VIDEO_UPLOAD') {
-                app.system(`\n비디오를 업로드하지 못했습니다. 3시간 뒤 다시 시도합니다..`)
-                return Timeout = 1000 * 60 * 60 * 3;
+            if (playlist.length <= 0) {
+                app.system("플레이리스트가 비어 있습니다. 1분 뒤 다시 시도합니다.");
+                Timeout = 1000 * 60;
+                return;
             }
 
-            await new Trash({ title: app.trackInfo?.track, artist: app.trackInfo?.rawArtist, album: app.trackInfo?.album, trackId: app.trackInfo?.trackId }).save();
+            const track = Number(playlist[0].trackId);
+            const video = await app.createVideoTrack(track);
 
-            app.system(`비디오를 성공적으로 업로드 하였습니다. 1시간 뒤 프로세스를 반복합니다.`);
-            app.system(`업로드 정보\n🔗 Youtube : ${upload.path}\n🎧 Title : ${app.trackInfo?.rawTrack}\n🎤 Artist : ${app.trackInfo?.rawArtist}\n💿 Album : ${app.trackInfo?.album}\n📅 Release : ${app.trackInfo?.release.replace(/^(\d{4})(\d{2})(\d{2})$/, '$1년$2월$3일')}`)
-            return Timeout = 1000 * 60 * 60;
+            if (video.code === "ERR_VIDEO_NOT_GENERATION") {
+                app.system("ERR 알 수 없는 이유로 비디오를 생성하지 못했습니다. 30분 뒤 다시 시도합니다.");
+                Timeout = 1000 * 60 * 30;
+                return;
+            }
+
+            if (video.code === "ERR_VIDEO_NOT_FOUND") {
+                app.system("ERR YT 비디오를 찾지 못했습니다. 1분 뒤 다시 시도합니다.");
+                Timeout = 1000 * 60;
+                return;
+            }
+
+            if (video.code === "ERR_LYRICS_NOT_FOUND") {
+                app.system("ERR 싱크 가사가 등록되어 있지 않습니다. 1분 뒤 다시 시도합니다.");
+                Timeout = 1000 * 60;
+                return;
+            }
+
+            if (video.code === "SUCCESS_VIDEO_CREATED") {
+                app.system("비디오가 성공적으로 생성되었습니다.");
+
+                const upload = await app.uploadToYouTube(video.path);
+
+                if (upload.code === "ERR_VIDEO_UPLOAD") {
+                    app.system("비디오를 업로드하지 못했습니다. 3시간 뒤 다시 시도합니다.");
+                    Timeout = 1000 * 60 * 60 * 3;
+                    return;
+                }
+
+                await Add.deleteMany({ trackId: app.trackInfo?.trackId });
+                await new Trash({
+                    title: app.trackInfo?.track,
+                    artist: app.trackInfo?.rawArtist,
+                    album: app.trackInfo?.album,
+                    trackId: app.trackInfo?.trackId,
+                }).save();
+
+                app.system("비디오를 성공적으로 업로드 하였습니다. 1시간 뒤 프로세스를 반복합니다.");
+                app.system(`업로드 정보\n🔗 Youtube : ${upload.path}\n🎧 Title : ${app.trackInfo?.rawTrack}\n🎤 Artist : ${app.trackInfo?.rawArtist}\n💿 Album : ${app.trackInfo?.album}\n📅 Release : ${app.trackInfo?.release.replace(/^(\d{4})(\d{2})(\d{2})$/,"$1년$2월$3일")}`);
+                Timeout = 1000 * 60 * 60;
+            }
+        } catch (error) {
+            app.system(`예기치 않은 오류가 발생했습니다: ${error}. 30분 뒤 다시 시도합니다.`);
+            Timeout = 1000 * 60 * 30;
+        } finally {
+            app.system(`다음 실행까지 ${Timeout / 1000 / 60}분 대기합니다.`);
+            await timers.setTimeout(Timeout);
+            processLoop();
         }
+    };
 
-        await timers.setTimeout(Timeout)
-    }
+    processLoop();
 })();
