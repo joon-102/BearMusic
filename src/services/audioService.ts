@@ -36,26 +36,13 @@ export class audioService {
             
             const VideoDetail = await this.getVideoDetails(video.id.videoId);
 
-            if (String(VideoDetail).includes("Auto-generated") && !title.includes("(instrumental)")) {
+            if (VideoDetail.includes("Auto-generated") && !title.includes("(instrumental)") && VideoDetail.includes(request.data.track.artist_disp_nm.replace(/\(.*?\)/g, '').trim())) {
                 selectedVideos.push(video);
             };
         };
 
         if (!selectedVideos[0]) return null;
     
-        for(let i = 0; i < selectedVideos.length; i++) {
-            const video : any = selectedVideos[i];
-
-            if(video.snippet.channelTitle.includes(request.data.track.artist_disp_nm)) {
-                return video.id.videoId;
-            }
-
-            if(video.snippet.title.includes(request.data.track.track_title)) {
-                return video.id.videoId;
-            }   
-
-        }
-
         return selectedVideos[0].id.videoId;
     }
 

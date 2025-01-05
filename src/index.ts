@@ -6,6 +6,7 @@ import { videoService } from './services/videoService';
 import Add from './models/Add'
 import Trash from './models/Trash'
 
+import axios from 'axios';
 import timers from 'node:timers/promises'
 import * as YouTubeUploader from 'youtube-videos-uploader';
 import * as dotenv from 'dotenv';
@@ -27,16 +28,19 @@ class BearMusic {
 
     async debug(message: string) {
         console.debug("\x1b[32m%s\x1b[0m", `[ DEBUG ] ${message}`);
+        axios.post(String(process.env.WEBHOOK_URL), { content: `[ DEBUG ]  ${message}` }).catch(() => { return; });
     }
 
     async system(message: string) {
         console.debug("\x1b[34m%s\x1b[0m", `[ SYSTEM ] ${message}`);
+        axios.post(String(process.env.WEBHOOK_URL), { content: `[ SYSTEM ] ${message}`}).catch(() => { return; });
+
     }
 
     async uploadToYouTube(videoPath: string): Promise<{ code: string, path: string, error?: string }> {
         try {
             let isSuccess: boolean = false;
-            const tag = "#" + ['가사', '베어뮤직', 'BearMusic', this.trackInfo?.rawTrack.replace(/[^a-zA-Z0-9가-힣\s]/g, ''), this.trackInfo?.rawArtist.replace(/[^a-zA-Z0-9가-힣\s]/g, ''), this.trackInfo?.album.replace(/[^a-zA-Z0-9가-힣\s]/g, '')].join('#');
+            const tag = "#" + ['가사', '베어뮤직', this.trackInfo?.rawArtist.replace(/[^a-zA-Z0-9가-힣\s]/g, '')].join('#');
             const video = [{
                 path: videoPath,
                 title: `${this.trackInfo?.rawTrack} - ${this.trackInfo?.rawArtist} | [가사/lyrics] `,
@@ -140,12 +144,14 @@ class BearMusic {
 
             if (video.code === "ERR_VIDEO_NOT_FOUND") {
                 app.system("ERR YT 비디오를 찾지 못했습니다. 1분 뒤 다시 시도합니다.");
+                await Add.deleteMany({ trackId: app.trackInfo?.trackId });
                 Timeout = 1000 * 60;
                 return;
             }
 
             if (video.code === "ERR_LYRICS_NOT_FOUND") {
                 app.system("ERR 싱크 가사가 등록되어 있지 않습니다. 1분 뒤 다시 시도합니다.");
+                await Add.deleteMany({ trackId: app.trackInfo?.trackId });
                 Timeout = 1000 * 60;
                 return;
             }
@@ -169,6 +175,7 @@ class BearMusic {
                     trackId: app.trackInfo?.trackId,
                 }).save();
 
+                axios.post(String(process.env.WEBHOOK_URL), { content: `비디오를 성공적으로 업로드 하였습니다. 1시간 뒤 프로세스를 반복합니다.\n업로드 정보\n🔗 Youtube : ${upload.path}\n🎧 Title : ${app.trackInfo?.rawTrack}\n🎤 Artist : ${app.trackInfo?.rawArtist}\n💿 Album : ${app.trackInfo?.album}\n📅 Release : ${app.trackInfo?.release.replace(/^(\d{4})(\d{2})(\d{2})$/, "$1년$2월$3일")}` }).catch(() => { return; })
                 app.system("비디오를 성공적으로 업로드 하였습니다. 1시간 뒤 프로세스를 반복합니다.");
                 app.system(`업로드 정보\n🔗 Youtube : ${upload.path}\n🎧 Title : ${app.trackInfo?.rawTrack}\n🎤 Artist : ${app.trackInfo?.rawArtist}\n💿 Album : ${app.trackInfo?.album}\n📅 Release : ${app.trackInfo?.release.replace(/^(\d{4})(\d{2})(\d{2})$/, "$1년$2월$3일")}`);
                 Timeout = 1000 * 60 * 60;

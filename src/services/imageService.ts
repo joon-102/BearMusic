@@ -156,6 +156,17 @@ export class imageService {
                     `),
                     gravity: 'northwest'
                 },
+                {
+                    input: Buffer.from(`
+                        <svg width="${width}" height="${height}">
+                            <text x="320" y="143.5" font-family="SB 어그로 M" font-size="60" fill="White" text-anchor="middle" dominant-baseline="middle">
+                                <tspan x="315" dy="0">BEAR</tspan>
+                                <tspan dx="-9" dy="0">MUSIC</tspan>
+                            </text>
+                        </svg>
+                        `),
+                    gravity: 'northwest'
+                },
             ])
             .toFormat('png')
             .toBuffer();
