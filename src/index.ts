@@ -175,7 +175,6 @@ class BearMusic {
                     trackId: app.trackInfo?.trackId,
                 }).save();
 
-                axios.post(String(process.env.WEBHOOK_URL), { content: `비디오를 성공적으로 업로드 하였습니다. 1시간 뒤 프로세스를 반복합니다.\n업로드 정보\n🔗 Youtube : ${upload.path}\n🎧 Title : ${app.trackInfo?.rawTrack}\n🎤 Artist : ${app.trackInfo?.rawArtist}\n💿 Album : ${app.trackInfo?.album}\n📅 Release : ${app.trackInfo?.release.replace(/^(\d{4})(\d{2})(\d{2})$/, "$1년$2월$3일")}` }).catch(() => { return; })
                 app.system("비디오를 성공적으로 업로드 하였습니다. 1시간 뒤 프로세스를 반복합니다.");
                 app.system(`업로드 정보\n🔗 Youtube : ${upload.path}\n🎧 Title : ${app.trackInfo?.rawTrack}\n🎤 Artist : ${app.trackInfo?.rawArtist}\n💿 Album : ${app.trackInfo?.album}\n📅 Release : ${app.trackInfo?.release.replace(/^(\d{4})(\d{2})(\d{2})$/, "$1년$2월$3일")}`);
                 Timeout = 1000 * 60 * 60;
