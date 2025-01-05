@@ -99,8 +99,8 @@ const getNewestChart = async () => {
             tracks.push({ title, artist, trackId, artistId, imgSrc, albumId });
         }
     });
-    
-    return tracks;
+
+    return tracks.slice(0, 20);
 };
 
 const getSinklyrics = async (trackId) => {
