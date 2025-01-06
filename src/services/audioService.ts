@@ -3,6 +3,15 @@ import { exec } from 'youtube-dl-exec';
 
 export class audioService {
 
+    isWithinOneMonth(isoTime: string): boolean {
+        const givenDate = new Date(isoTime);
+        const now = new Date();
+        const oneMonthAgo = new Date();
+        oneMonthAgo.setMonth(now.getMonth() - 1); // 한 달 전 날짜
+
+        return givenDate.getTime() >= oneMonthAgo.getTime();
+    }
+
     async getVideoDetails(videoId: string): Promise<string> {
         const response = await axios.get('https://www.googleapis.com/youtube/v3/videos', {
             params: {
@@ -17,7 +26,7 @@ export class audioService {
 
     async getVideoyt(trackId: number): Promise<string | null> {
         const request: AxiosResponse<{ track: any }> = await axios.get<any>(`https://music.bugs.co.kr/player/track/${trackId}`);
-        
+
         const response: AxiosResponse<{ items: any }> = await axios.get('https://www.googleapis.com/youtube/v3/search', {
             params: {
                 part: 'snippet',
@@ -33,16 +42,16 @@ export class audioService {
         for (let i = 0; i < response.data.items.length; i++) {
             const video = response.data.items[i];
             const title = String(video.snippet.title);
-            
+
             const VideoDetail = await this.getVideoDetails(video.id.videoId);
 
-            if (VideoDetail.includes("Auto-generated") && !title.includes("(instrumental)") && VideoDetail.includes(request.data.track.artist_disp_nm.replace(/\(.*?\)/g, '').trim())) {
+            if (this.isWithinOneMonth(video.snippet.publishTime) && VideoDetail.includes("Auto-generated") && !title.includes("(instrumental)") && VideoDetail.includes(request.data.track.artist_disp_nm.replace(/\(.*?\)/g, '').trim())) {
                 selectedVideos.push(video);
             };
         };
 
         if (!selectedVideos[0]) return null;
-    
+
         return selectedVideos[0].id.videoId;
     }
 
