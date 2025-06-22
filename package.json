@@ -1,0 +1,8 @@
+{
+  "name": "bearmusic",
+  "version": "3.0.0",
+  "description": "자동 가사 싱크 기반 유튜브 리릭 비디오 생성기",
+  "main": "dist/index.js",
+  "repository": "https://github.com/joon-102/BearMusic/tree/main",
+  "license": "MIT"
+}
