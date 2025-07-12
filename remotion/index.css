@@ -1,0 +1,19 @@
+@import "tailwindcss";
+
+@font-face {
+    font-family: 'PyeojinGothic-Bold';
+    src: url('../public/fonts/PyeojinGothic-Bold.woff2') format('woff2');
+    font-weight: 700;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'PyeojinGothic-SemiBold';
+    src: url('../public/fonts/PyeojinGothic-SemiBold.woff2') format('woff2');
+    font-weight: 700;
+    font-style: normal;
+}
+
+body {
+  font-family: "PyeojinGothic-Bold";
+}

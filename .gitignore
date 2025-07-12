@@ -1,3 +1,9 @@
 node_modules
 dist
-public
+.env
+yt-auth
+out
+
+public/*
+!public/fonts/
+!public/fonts/**
