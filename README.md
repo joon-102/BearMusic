@@ -30,12 +30,6 @@
 > **[유튜브 채널 바로가기](https://www.youtube.com/@%EB%B2%A0%EC%96%B4%EB%AE%A4%EC%A7%81)**  
 
 ## 시작하기
-
-### 환경 설정
-- Node.js (v22 이상)  
-- yarn  
-- FFmpeg (시스템 PATH에 등록되어 있어야 함)
-
 ### 1. 저장소 복제
 
 ```bash
