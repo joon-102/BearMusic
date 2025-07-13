@@ -62,6 +62,7 @@ GOODLE_ACCOUNT_PASS=""
 > 서버 실행 시 함께 동작하여 자동으로 큐를 채웁니다.
 
 ```bash
+node .\createQueue.mjs
 yarn run build
 yarn start
 ```

@@ -19,12 +19,12 @@ const pendingQueues = mongoose.model("pendingqueues", new mongoose.Schema(
     }
 ));
 
-const INTERVAL = 120000;
+const INTERVAL = 520000;
 
 (async () => {
     await mongoose.connect(process.env.MONGO_URI);
 
-    let Queue = await getChart();
+    let Queue = [];
 
     console.log(`${INTERVAL / 1000}초 마다 차트 데이터를 가져옵니다.`);
 
@@ -72,7 +72,7 @@ const INTERVAL = 120000;
 
 
 const getChart = async () => {
-    const trackRes = await axios.get('https://music.bugs.co.kr/chart/track/day/nb');
+    const trackRes = await axios.get('https://music.bugs.co.kr/chart/track/day/nb'); // https://music.bugs.co.kr/chart/track/day/nfa
     const $ = load(trackRes.data);
 
     const tracks = [];
@@ -98,7 +98,7 @@ const getChart = async () => {
         tracks.push({ title, artist, trackId, artistId, imgSrc, albumId });
     });
 
-    return tracks.slice(0, 10);
+    return tracks.slice(0, 30);
 };
 
 const getSinklyrics = async (trackId) => {

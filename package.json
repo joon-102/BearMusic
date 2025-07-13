@@ -40,8 +40,9 @@
     "typescript": "5.8.2"
   },
   "scripts": {
-    "dev": "remotion studio",
-    "upgrade": "remotion upgrade",
+    "dev": "remotion studio ./remotion/index.ts",
+    "build" : "tsc",
+    "start" : "node ./dist/index.js",
     "lint": "eslint src && tsc",
     "make-blurred": "ts-node remotion/util/make-blurred.ts",
     "convert-webp": "ts-node remotion/util/convert-webp.ts"
