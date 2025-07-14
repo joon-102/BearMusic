@@ -76,7 +76,7 @@ export async function startWorker() {
         await writeFile('public/song-info.json', JSON.stringify(songInfo, null, 2), 'utf-8');
 
         await new Promise((resolve, reject) => {
-            const child = spawn('npx', ['remotion', 'render' , 'remotion/index.ts'], { cwd: process.cwd(), shell: true });
+            const child = spawn('npx', ['remotion', 'render', 'remotion/index.ts'], { cwd: process.cwd(), shell: true });
 
             child.stdout.on('data', (data) => process.stdout.write(data.toString()));
             child.stderr.on('data', (data) => process.stderr.write(data.toString()));

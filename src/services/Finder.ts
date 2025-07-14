@@ -34,17 +34,19 @@ export async function Finder(trackId: string, title: string, artist: string): Pr
   const AudioA = await tmp.file({ postfix: '.wav' });
   const AudioB = await tmp.file({ postfix: '.wav' });
 
-  await downloadYoutubeAudio(searchVideos[0].id)
+  await downloadYoutubeAudio(searchVideos[0].id);
+
   await downloadSampleAudio(trackId, AudioA);
   await reencodeFirstMinute('public/audio.mp3', AudioB.path);
 
   console.log(`[audio] 비교 원본 음원 다운로드 완료`);
 
   const wavA = await convertToWavTmp(AudioA.path);
-  const wavB = await convertToWavTmp(AudioA.path);
+  const wavB = await convertToWavTmp(AudioB.path);
 
   const similarity = await compareFingerprint(wavA, wavB);
 
   console.log(`[audio] 오디오 유사도 (fpcalc): ${similarity.toFixed(2)}%`);
   return similarity > 90;
 }
+

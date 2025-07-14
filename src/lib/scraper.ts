@@ -1,6 +1,5 @@
 import { chromium } from "playwright";
-import { writeFile, unlink, rename } from 'fs/promises';
-import ffmpeg from 'fluent-ffmpeg'
+import { writeFile } from 'fs/promises';
 
 export async function downloadSampleAudio(trackId: string, AudioA: any) {
     const browser = await chromium.launch({ headless: true, executablePath: process.env.CHROME_PATH });
@@ -29,20 +28,4 @@ export async function downloadSampleAudio(trackId: string, AudioA: any) {
 
     const base64 = await audioPromise;
     await writeFile(AudioA.path, Buffer.from(base64, 'base64'));
-
-    const tmpOutput = `${AudioA.path}.tmp.mp3`;
-
-    try { await unlink(tmpOutput); } catch { }
-
-    await new Promise((resolve, reject) => {
-        ffmpeg(AudioA.path)
-            .audioCodec('libmp3lame').audioFrequency(44100).audioBitrate(128).audioChannels(2)
-            .on('error', () => reject())
-            .on('end', async () => {
-                await unlink(AudioA.path);
-                await rename(tmpOutput, AudioA.path);
-                resolve("");
-            })
-            .save(tmpOutput);
-    });
 }
