@@ -81,8 +81,8 @@ async function searchYoutubeDescription(videoId: string): Promise<{ id: string, 
     }
 };
 
-function reencodeFirstMinute(inputPath: string, outputPath: string): Promise<void> {
-    return new Promise((resolve, reject) => {
+async function reencodeFirstMinute(inputPath: string, outputPath: string): Promise<void> {
+    return await new Promise((resolve, reject) => {
         ffmpeg(inputPath)
             .setStartTime(0).setDuration(60).audioBitrate(128).audioCodec('libmp3lame').audioFrequency(44100).audioChannels(2)
             .on('error', () => reject())
@@ -94,7 +94,7 @@ function reencodeFirstMinute(inputPath: string, outputPath: string): Promise<voi
 
 async function convertToWavTmp(inputPath: string): Promise<string> {
     const { path: tmpPath } = await tmp.file({ postfix: '.wav' });
-    return new Promise((resolve, reject) => {
+    return await new Promise((resolve, reject) => {
         ffmpeg(inputPath)
             .audioChannels(1).audioFrequency(16000).format('wav')
             .on('error', (err) => { reject(err); })
