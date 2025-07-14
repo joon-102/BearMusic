@@ -27,6 +27,7 @@ BearMusic은 리릭 비디오 제작을 자동화하기 위한 애플리케이�
 ### **작동 과정**  
 🗂 차트 음악 선정 → 🎵 음원 추출 → 📝 가사 수집 및 싱크 → 🎬 동영상 자동 생성 → ⬆️ 유튜브 업로드 → 📡 실시간 진행 상황 모니터링
 
+<br>
 
 ## [기술 스택](#목차)
 
@@ -39,12 +40,16 @@ BearMusic은 리릭 비디오 제작을 자동화하기 위한 애플리케이�
 [![Playwright](https://img.shields.io/badge/Playwright-000000?style=flat-square&logo=playwright&logoColor=white)](https://playwright.dev/)
 [![FFmpeg](https://img.shields.io/badge/FFmpeg-FFFFFF?style=flat-square&logo=ffmpeg&logoColor=black)](https://ffmpeg.org/)
 
+<br>
+
 ## [프리뷰](#목차)
 
 **`황가람 - 나는 반딧불 [나는 반딧불]ㅣ가사/Lyrics`**
 
 [![황가람 - 나는 반딧불 [나는 반딧불]ㅣ가사/Lyrics](http://img.youtube.com/vi/hhk4NYiCgeo/0.jpg)](https://www.youtube.com/watch?v=hhk4NYiCgeo)  
 > **[유튜브 채널 바로가기](https://www.youtube.com/@%EB%B2%A0%EC%96%B4%EB%AE%A4%EC%A7%81)**  
+
+<br>
 
 ## [시작하기](#목차)
 ### 1. 저장소 복제
@@ -83,6 +88,8 @@ node .\createQueue.mjs
 yarn run build
 yarn start
 ```
+
+<br>
 
 ## [피드백](#목차)
 
