@@ -2,9 +2,9 @@
   <h1 style="display: flex; align-items: center; justify-content: center; width: 100%;">
     BearMusic
   </h1>
-  <h5>
+  <h4>
      차트를 기반으로 음원 추출, 가사 싱크, 비디오 렌더링 및 유튜브 업로드 과정을 자동화하는 리릭 비디오 생성 애플리케이션 📺
-  </h5>
+  </h4>
 </div>
 
 <br>
