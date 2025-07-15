@@ -138,8 +138,8 @@ export async function startWorker() {
         }
 
         if (isSuccess) {
-            console.log("[Upload] 영상 업로드 성공, 2시간 후 다시 실행합니다")
-            return Timeout = 1000 * 60 * 120;
+            console.log("[Upload] 영상 업로드 성공, 1시간 후 다시 실행합니다")
+            return Timeout = 1000 * 60 * 60;
         }
     } catch (error) {
         console.log(`예기치 않은 오류가 발생했습니다: ${error}. 30분 뒤 다시 시도합니다.`);
