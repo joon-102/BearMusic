@@ -1,96 +1,76 @@
-<div align="center">
-  <h1 style="display: flex; align-items: center; justify-content: center; width: 100%;">
-    BearMusic
-  </h1>
-  <h4>
-     차트를 기반으로 음원 추출, 가사 싱크, 비디오 렌더링 및 유튜브 업로드 과정을 자동화하는 리릭 비디오 생성 애플리케이션 📺
-  </h4>
-</div>
-
-<br>
+# BEAR MUSIC
+#### 음원 추출, 가사 싱크, 비디오 렌더링 및 유튜브 업로드 과정을 자동화하는 리릭 비디오 생성 애플리케이션
 
 ## 목차
-
 1. [개요](#개요)
-2. [기술 스택](#기술-스택)
-3. [프리뷰](#프리뷰)
+2. [프리뷰](#프리뷰)
+2. [기술 스택](#기술스택)
 4. [시작하기](#시작하기)
 5. [피드백](#피드백)
 
-<br/>
-
 ## [개요](#목차)
-BearMusic은 리릭 비디오 제작을 자동화하기 위한 애플리케이션입니다. 실시간 음악 차트에서 곡을 자동으로 선택하고, 해당 곡의 음원과 가사를 수집하여 **Remotion**를 사용해 동기화된 리릭 비디오를 생성하고 유튜브에 자동 업로드합니다.
-  
-이전 버전(v2)은 [여기](https://github.com/joon-102/BearMusic/tree/BearMusic-V2)서 확인할 수 있습니다
-<br>
-### **작동 과정**  
-🗂 차트 음악 선정 → 🎵 음원 추출 → 📝 가사 수집 및 싱크 → 🎬 동영상 자동 생성 → ⬆️ 유튜브 업로드 → 📡 실시간 진행 상황 모니터링
+**BEAR MUSIC** 은 리릭 비디오 제작을 자동화하기 위한 애플리케이션입니다. 실시간 음악 차트에서 곡을 자동으로 선택하고, 해당 곡의 음원과 가사를 수집하여 Remotion를 사용해 동기화된 리릭 비디오를 생성하고 유튜브에 자동 업로드합니다.
 
-<br>
+### 주요 기능
+- 🗂 차트 음악 선정
+- 🎵 음원 추출
+- 📝 가사 수집 및 싱크
+- 🎬 동영상 자동 생성 
+- ⬆️ 유튜브 업로드
+- 📡 실시간 진행 상황 모니터링
+
+이전 버전(v2)은 [여기](https://github.com/joon-102/BearMusic/tree/BearMusic-V2)서 확인할 수 있습니다
+
+## [프리뷰](#프리뷰)
+🎬 **샘플 영상: 황가람 - 나는 반딧불 [가사/리릭 비디오]**
+
+[![황가람 - 나는 반딧불 [나는 반딧불]ㅣ가사/Lyrics](http://img.youtube.com/vi/hhk4NYiCgeo/0.jpg)](https://www.youtube.com/watch?v=hhk4NYiCgeo)  
+👉 [유튜브 채널 바로가기](https://www.youtube.com/@%EB%B2%A0%EC%96%B4%EB%AE%A4%EC%A7%81)
 
 ## [기술 스택](#목차)
 
-[![Node.js](https://img.shields.io/badge/Node.js-339933?style=flat-square&logo=node.js&logoColor=white)](https://nodejs.org/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=flat-square&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
-[![Remotion](https://img.shields.io/badge/Remotion-FF3E00?style=flat-square&logo=remotion&logoColor=white)](https://www.remotion.dev/)
-[![React](https://img.shields.io/badge/React-61DAFB?style=flat-square&logo=react&logoColor=black)](https://reactjs.org/)
-[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-06B6D4?style=flat-square&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
-[![MongoDB](https://img.shields.io/badge/MongoDB-47A248?style=flat-square&logo=mongodb&logoColor=white)](https://www.mongodb.com/)
-[![Playwright](https://img.shields.io/badge/Playwright-000000?style=flat-square&logo=playwright&logoColor=white)](https://playwright.dev/)
-[![FFmpeg](https://img.shields.io/badge/FFmpeg-FFFFFF?style=flat-square&logo=ffmpeg&logoColor=black)](https://ffmpeg.org/)
-
-<br>
-
-## [프리뷰](#목차)
-
-**`황가람 - 나는 반딧불 [나는 반딧불]ㅣ가사/Lyrics`**
-
-[![황가람 - 나는 반딧불 [나는 반딧불]ㅣ가사/Lyrics](http://img.youtube.com/vi/hhk4NYiCgeo/0.jpg)](https://www.youtube.com/watch?v=hhk4NYiCgeo)  
-> **[유튜브 채널 바로가기](https://www.youtube.com/@%EB%B2%A0%EC%96%B4%EB%AE%A4%EC%A7%81)**  
-
-<br>
+**BEAR MUSIC** 는 아래와 같은 오픈소스를 사용합니다:
+- [Node.js](https://nodejs.org/) 
+- [TypeScript](https://www.typescriptlang.org/) 
+- [Remotion](https://www.remotion.dev/) 
+- [React](https://reactjs.org/) 
+- [Tailwind CSS](https://tailwindcss.com/)
+- [MongoDB](https://www.mongodb.com/)
+- [Playwright](https://playwright.dev/) 
+- [FFmpeg](https://ffmpeg.org/) 
 
 ## [시작하기](#목차)
-### 1. 저장소 복제
+- [Node.js](https://nodejs.org/) - v20 이상 
+- [yarn](https://yarnpkg.com/) 
+- [FFmpeg](https://ffmpeg.org/) 
+- [fpcalc](https://acoustid.org/chromaprint)  
 
-```bash
+#### 저장소 복제
+```sh
 git clone https://github.com/joon-102/BearMusic.git
 cd BearMusic
 ```
-
-### 2. 의존성 설치
-
-```bash
+#### 의존성 설치
+```sh
 yarn install
 ```
-
-### 3. 환경 변수 설정
-
+환경 변수 설정
 프로젝트 루트에 `.env` 파일을 생성하고, `.env.example` 파일을 참고하여 필요한 환경 변수를 설정합니다.
 
 ```dotenv
-# .env.example
 MONGO_URI=""
 PORT=3000
 CHROME_PATH="C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe"
 GOODLE_ACCOUNT_EMAIL=""
 GOODLE_ACCOUNT_PASS=""
 ```
-
-### 4. 서버 실행
-
+#### 실행
 > `createQueue.mjs`는 차트 기반 자동 플레이리스트를 구성하는 스크립트입니다.  
-> 서버 실행 시 함께 동작하여 자동으로 큐를 채웁니다.
-
-```bash
+> 영상 생성 전에 먼저 실행해주세요.
+```sh
 node .\createQueue.mjs
 yarn run build
 yarn start
 ```
-
-<br>
-
 ## [피드백](#목차)
-
-이 프로젝트에 대한 제안, 버그 제보 또는 개선 아이디어가 있다면 [Issue](https://github.com/joon-102/BearMusic/issues)로 남겨주세요.
+이 프로젝트에 대한 제안, 버그 제보 또는 개선 아이디어가 있다면 [ISSUE](https://github.com/joon-102/BearMusic/issues)로 남겨주세요.
