@@ -19,7 +19,7 @@ const pendingQueues = mongoose.model("pendingqueues", new mongoose.Schema(
     }
 ));
 
-const INTERVAL = 520000;
+const INTERVAL = 1000 * 60 * 60 * 10; // 10 hours
 
 (async () => {
     await mongoose.connect(process.env.MONGO_URI);
@@ -30,8 +30,19 @@ const INTERVAL = 520000;
 
     async function Run() {
         console.log("새로운 차트 데이터를 가져오는 중...");
-        const newQueue = await getChart();
-        const newItems = newQueue.filter(item => !Queue.some(oldItem => oldItem.trackId === item.trackId));
+
+        const types = ["nb", "nfa", "nindie", "nrs"];
+        const results = await Promise.all(types.map(type => getChart(type)));
+        let newQueue = results.flat();
+
+        newQueue = newQueue.filter(
+            (item, index, self) =>
+                index === self.findIndex(t => t.trackId === item.trackId)
+        );
+
+        const newItems = newQueue.filter(
+            item => !Queue.some(oldItem => oldItem.trackId === item.trackId)
+        );
 
         for (const item of newItems) {
             const trackId = Number(item.trackId);
@@ -60,7 +71,7 @@ const INTERVAL = 520000;
 
             await addData.save();
             console.log(`trackId ${trackId} 데이터베이스에 추가됨.`);
-        }   
+        }
 
         Queue = newQueue;
         console.log("데이터 업데이트 완료.");
@@ -68,11 +79,10 @@ const INTERVAL = 520000;
 
     Run();
     setInterval(Run, INTERVAL);
-})()
+})();
 
-
-const getChart = async () => {
-    const trackRes = await axios.get('https://music.bugs.co.kr/chart/track/day/nb'); // https://music.bugs.co.kr/chart/track/day/nfa
+const getChart = async (type = "nrs") => {
+    const trackRes = await axios.get(`https://music.bugs.co.kr/chart/track/day/${type}`);
     const $ = load(trackRes.data);
 
     const tracks = [];
@@ -82,7 +92,6 @@ const getChart = async () => {
 
         const title = $el.find('.title a').text().trim();
         const artist = $el.find('.artist a').text().trim();
-
         if (!title || !artist) return;
 
         const trackHref = $el.find('.trackInfo').attr('href') ?? '';
@@ -98,8 +107,9 @@ const getChart = async () => {
         tracks.push({ title, artist, trackId, artistId, imgSrc, albumId });
     });
 
-    return tracks.slice(0, 30);
+    return tracks.slice(0, 100);
 };
+
 
 const getSinklyrics = async (trackId) => {
     const response = await axios.get(`https://music.bugs.co.kr/player/lyrics/T/${trackId}`);
