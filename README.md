@@ -74,3 +74,8 @@ yarn start
 ```
 ## [피드백](#목차)
 이 프로젝트에 대한 제안, 버그 제보 또는 개선 아이디어가 있다면 [ISSUE](https://github.com/joon-102/BearMusic/issues)로 남겨주세요.
+
+### 📄 라이선스
+[![License: CC BY-NC 4.0](https://img.shields.io/badge/License-CC%20BY--NC%204.0-lightgrey.svg)](https://creativecommons.org/licenses/by-nc/4.0/)
+
+이 프로젝트는 CC BY-NC 4.0 라이선스에 따라 사용됩니다.
