@@ -89,8 +89,8 @@ export async function startWorker() {
 
         let isSuccess = false;
         const credentials = {
-            email: String(process.env.GOODLE_ACCOUNT_EMAIL),
-            pass: String(process.env.GOODLE_ACCOUNT_PASS),
+            email: String(process.env.GOOGLE_ACCOUNT_EMAIL),
+            pass: String(process.env.GOOGLE_ACCOUNT_PASS),
         };
 
         const formattedReleaseDate = String(release).replace(

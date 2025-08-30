@@ -62,8 +62,8 @@ yarn install
 MONGO_URI=""
 PORT=3000
 CHROME_PATH="C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe"
-GOODLE_ACCOUNT_EMAIL=""
-GOODLE_ACCOUNT_PASS=""
+GOOGLE_ACCOUNT_EMAIL=""
+GOOGLE_ACCOUNT_PASS=""
 ```
 #### 실행
 > `createQueue.mjs`는 차트 기반 자동 플레이리스트를 구성하는 스크립트입니다.  
