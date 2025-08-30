@@ -1,19 +1,34 @@
 import axios from 'axios';
-import timers from 'node:timers/promises'
+import timers from 'node:timers/promises';
 import { exec } from 'child_process';
 import { promisify } from 'util';
 import sharp from 'sharp';
 import { writeFile } from 'fs/promises';
 import mm from 'music-metadata';
 import { upload } from 'youtube-videos-uploader';
+import dayjs from 'dayjs';
 
 import pendingqueue from '../models/pendingQueue';
 import historyQueue from '../models/historyQueue';
+import RenderStatus from '../models/RenderStatus';
 
 import { Finder } from '../services/Finder';
 import { spawn } from 'node:child_process';
 
 const execAsync = promisify(exec);
+
+let lastUpdate = 0;
+async function updateStatus(fields: any) {
+    const now = Date.now();
+    if (now - lastUpdate >= 10000) {
+        await RenderStatus.findOneAndUpdate(
+            {},
+            { ...fields, updatedAt: new Date() },
+            { upsert: true, new: true }
+        );
+        lastUpdate = now;
+    }
+};
 
 export async function startWorker() {
     let Timeout = 1000 * 60 * 60;
@@ -55,6 +70,16 @@ export async function startWorker() {
             trackId: trackId
         }).save();
 
+        await updateStatus({
+            title: title,
+            artist: artist,
+            album: album,
+            StartAt: dayjs().format('YYYY-MM-DD HH:mm'),
+            status: '렌더링 준비',
+            progress: 0,
+            duration: '',
+        });
+
         const audio = await Finder(trackId, title, artist.replace(/\([^)]*\)/g, '').trim());
 
         if (!audio) {
@@ -75,11 +100,39 @@ export async function startWorker() {
 
         await writeFile('public/song-info.json', JSON.stringify(songInfo, null, 2), 'utf-8');
 
-        await new Promise((resolve, reject) => {
+        await new Promise(async (resolve, reject) => {
             const child = spawn('npx', ['remotion', 'render', 'remotion/index.ts'], { cwd: process.cwd(), shell: true });
 
-            child.stdout.on('data', (data) => process.stdout.write(data.toString()));
+            child.stdout.on('data', async (data) => {
+                const str = data.toString();
+                process.stdout.write(str)
+
+                if (str.startsWith('Rendered') && str.includes('time remaining')) {
+                    const frameMatch = str.match(/Rendered (\d+)\/(\d+)/);
+                    const remainingMatch = str.match(/time remaining: ([\dhms\s]+)/);
+
+                    if (!frameMatch || !remainingMatch) return;
+
+                    const current = parseInt(frameMatch[1], 10);
+                    const total = parseInt(frameMatch[2], 10);
+                    const progress = ((current / total) * 100).toFixed(2);
+
+                    const remainingRaw = remainingMatch[1];
+                    const durMatch = remainingRaw.match(/(\d+)h\s*(\d+)m\s*(\d+)s/);
+                    const hours = durMatch ? durMatch[1] : 0;
+                    const minutes = durMatch ? durMatch[2] : 0;
+                    const seconds = durMatch ? durMatch[3] : 0;
+
+                    await updateStatus({
+                        status: '렌더링',
+                        progress: progress,
+                        duration: `${hours}시간 ${minutes}분 ${seconds}초`,
+                    });
+                }
+
+            });
             child.stderr.on('data', (data) => process.stderr.write(data.toString()));
+
 
             child.on('close', (code) => {
                 if (code === 0) resolve(code);
@@ -115,7 +168,7 @@ export async function startWorker() {
                 `📝 영상 피드백을 받고 있습니다!`,
                 `Forms: https://bit.ly/46duNSf`,
                 ``,
-                `#${artist.replace(/\([^)]*\)/g, '').trim()} #${title.replace(/\([^)]*\)/g, '').replace("(", "").replace(")", "").trim().replace(" ","")} #가사`
+                `#${artist.replace(/\([^)]*\)/g, '').trim()} #${title.replace(/\([^)]*\)/g, '').replace("(", "").replace(")", "").trim().replace(" ", "")} #가사`
             ].join('\n'),
             language: 'korean',
             skipProcessingWait: true,
@@ -132,6 +185,16 @@ export async function startWorker() {
                 isSuccess = true;
             }
         }];
+
+        await updateStatus({
+            title: "",
+            artist: "",
+            album: "",
+            StartAt: 0,
+            status: '대기',
+            progress: 0,
+            duration: '2시간 0분 0초',
+        });
 
         try {
             await upload(credentials, videoOptions, { headless: false });
