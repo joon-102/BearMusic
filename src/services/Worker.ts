@@ -44,10 +44,10 @@ export async function startWorker() {
 
         const albumId = String(trackRes.data.track.album_id);
 
-        const title = trackRes.data.track.track_title;
-        const artist = trackRes.data.track.artist_disp_nm;
-        const album = trackRes.data.track.album_title;
-        const release = trackRes.data.track.release_ymd;
+        const title = String(trackRes.data.track.track_title);
+        const artist = String(trackRes.data.track.artist_disp_nm);
+        const album = String(trackRes.data.track.album_title);
+        const release = String(trackRes.data.track.release_ymd);
 
         if (lyricsRes.data.lyrics === '') return (Timeout = 1000 * 60);
 
@@ -186,6 +186,7 @@ export async function startWorker() {
             }
         }];
 
+
         await updateStatus({
             title: "",
             artist: "",
@@ -198,7 +199,8 @@ export async function startWorker() {
 
         try {
             await upload(credentials, videoOptions, { headless: false });
-        } catch {
+        } catch(err) {
+            console.log(err);
             console.log("[Upload] YouTube 업로드 실패, 1시간 후 다시 실행합니다")
             return Timeout = 1000 * 60 * 1;
         }
@@ -208,6 +210,7 @@ export async function startWorker() {
             return Timeout = 1000 * 60 * 60 * 2;
         }
     } catch (error) {
+        console.log(error);
         console.log(`예기치 않은 오류가 발생했습니다: ${error}. 30분 뒤 다시 시도합니다.`);
         return Timeout = 1000 * 60 * 30;
     } finally {
