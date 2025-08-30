@@ -153,8 +153,8 @@ export async function startWorker() {
 
         const videoOptions: any = [{
             path: 'out/Composition.mp4',
-            title: `${artist.replace(/\([^)]*\)/g, '').trim()} - ${title.replace(/\([^)]*\)/g, '').replace("(", "").replace(")", "").trim()} [${album}]ㅣ가사/Lyrics`,
-            description: [
+            title: String(`${artist.replace(/\([^)]*\)/g, '').trim()} - ${title.replace(/\([^)]*\)/g, '').replace("(", "").replace(")", "").trim()} [${album}]ㅣ가사/Lyrics`),
+            description: String([
                 `🎶 본 영상은 가사 자막 영상입니다, 수익 창출은 되지 않습니다.`,
                 ``,
                 `🎧 Title : ${title}`,
@@ -169,7 +169,7 @@ export async function startWorker() {
                 `Forms: https://bit.ly/46duNSf`,
                 ``,
                 `#${artist.replace(/\([^)]*\)/g, '').trim()} #${title.replace(/\([^)]*\)/g, '').replace("(", "").replace(")", "").trim().replace(" ", "")} #가사`
-            ].join('\n'),
+            ].join('\n')),
             language: 'korean',
             skipProcessingWait: true,
             publishType: "PUBLIC",
@@ -185,7 +185,6 @@ export async function startWorker() {
                 isSuccess = true;
             }
         }];
-
 
         await updateStatus({
             title: "",
