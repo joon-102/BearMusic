@@ -119,14 +119,11 @@ export async function startWorker() {
 
                     const remainingRaw = remainingMatch[1];
                     const durMatch = remainingRaw.match(/(\d+)h\s*(\d+)m\s*(\d+)s/);
-                    const hours = durMatch ? durMatch[1] : 0;
-                    const minutes = durMatch ? durMatch[2] : 0;
-                    const seconds = durMatch ? durMatch[3] : 0;
 
                     await updateStatus({
                         status: '렌더링',
                         progress: progress,
-                        duration: `${hours}시간 ${minutes}분 ${seconds}초`,
+                        duration: `${durMatch}`,
                     });
                 }
 
@@ -193,7 +190,7 @@ export async function startWorker() {
             StartAt: 0,
             status: '대기',
             progress: 0,
-            duration: '2시간 0분 0초',
+            duration: '0시간 0분 0초',
         });
 
         try {
