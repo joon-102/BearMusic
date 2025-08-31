@@ -168,7 +168,7 @@ export async function startWorker() {
                 `📝 영상 피드백을 받고 있습니다!`,
                 `Forms: https://bit.ly/46duNSf`,
                 ``,
-                `#${artist.replace(/\([^)]*\)/g, '').trim()} #${title.replace(/\([^)]*\)/g, '').replace("(", "").replace(")", "").trim().replace(" ", "")} #가사`
+                `#${artist.replace(/[^a-zA-Z0-9가-힣]/g, '')} #${title.replace(/[^a-zA-Z0-9가-힣]/g, '')} #가사`
             ].join('\n')),
             language: 'korean',
             skipProcessingWait: true,
