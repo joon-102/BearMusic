@@ -19,7 +19,7 @@ const pendingQueues = mongoose.model("pendingqueues", new mongoose.Schema(
     }
 ));
 
-const INTERVAL = 1000 * 60 * 60 * 10; // 10 hours
+const INTERVAL = 1000 * 60 * 60 * 3; // 3시간
 
 (async () => {
     await mongoose.connect(process.env.MONGO_URI);
@@ -31,14 +31,18 @@ const INTERVAL = 1000 * 60 * 60 * 10; // 10 hours
     async function Run() {
         console.log("새로운 차트 데이터를 가져오는 중...");
 
-        const types = ["nb", "nfa", "nindie", "nrs"];
+        const types = ["nb", "nfa", "nindie", "nrs", "nost"];
         const results = await Promise.all(types.map(type => getChart(type)));
         let newQueue = results.flat();
+
+        console.log(`총 ${newQueue.length}개의 트랙을 가져왔습니다.`);
 
         newQueue = newQueue.filter(
             (item, index, self) =>
                 index === self.findIndex(t => t.trackId === item.trackId)
         );
+
+        console.log(`중복 제거 후 ${newQueue.length}개의 트랙이 남았습니다.`);
 
         const newItems = newQueue.filter(
             item => !Queue.some(oldItem => oldItem.trackId === item.trackId)
@@ -51,7 +55,7 @@ const INTERVAL = 1000 * 60 * 60 * 10; // 10 hours
             const trashList = await pendingQueues.findOne({ trackId });
 
             if (HistoryQueue || trashList) {
-                console.log(`trackId ${trackId}는 이미 ${HistoryQueue ? 'HistoryQueue' : 'PendingQueues'}에 존재합니다.`);
+                console.log(`${trackId} 이미 ${HistoryQueue ? 'HistoryQueue' : 'PendingQueues'}에 존재합니다.`);
                 continue;
             }
 
@@ -59,18 +63,17 @@ const INTERVAL = 1000 * 60 * 60 * 10; // 10 hours
             const lyrics = await getSinklyrics(trackId);
 
             if (!lyrics) {
-                console.log(`trackId ${trackInfo.track}의 가사를 찾을 수 없습니다.`);
+                console.log(`trackId ${trackId}의 가사를 찾을 수 없습니다.`);
                 continue;
             }
 
-            console.log(`trackId ${trackId} 추가 중...`);
             const addData = new pendingQueues({
                 identifier: `${trackInfo.artist} - ${trackInfo.track} [${trackInfo.album}]`,
                 trackId: item.trackId,
             });
 
             await addData.save();
-            console.log(`trackId ${trackId} 데이터베이스에 추가됨.`);
+            console.log(`${trackId} ${trackInfo.track} 데이터베이스에 추가됨.`);
         }
 
         Queue = newQueue;
