@@ -7,28 +7,41 @@ import { writeFile } from 'fs/promises';
 import mm from 'music-metadata';
 import { upload } from 'youtube-videos-uploader';
 import dayjs from 'dayjs';
+import { spawn } from 'node:child_process';
+import path from 'path';
 
 import pendingqueue from '../models/pendingQueue';
 import historyQueue from '../models/historyQueue';
 import RenderStatus from '../models/RenderStatus';
-
 import { Finder } from '../services/Finder';
-import { spawn } from 'node:child_process';
 
 const execAsync = promisify(exec);
+
+const PUBLIC_DIR = path.join(process.cwd(), 'public');
+const OUTPUT_DIR = path.join(process.cwd(), 'out');
+
+const ALBUM_COVER_PATH = path.join(PUBLIC_DIR, 'album-cover.png');
+const AUDIO_PATH = path.join(PUBLIC_DIR, 'audio.mp3');
+const SONG_INFO_PATH = path.join(PUBLIC_DIR, 'song-info.json');
+const VIDEO_PATH = path.join(OUTPUT_DIR, 'Composition.mp4');
 
 let lastUpdate = 0;
 async function updateStatus(fields: any) {
     const now = Date.now();
     if (now - lastUpdate >= 10000) {
-        await RenderStatus.findOneAndUpdate(
-            {},
-            { ...fields, updatedAt: new Date() },
-            { upsert: true, new: true }
-        );
-        lastUpdate = now;
+        try {
+            await RenderStatus.findOneAndUpdate(
+                {},
+                { ...fields, updatedAt: new Date() },
+                { upsert: true, new: true }
+            );
+        } catch (err: any) {
+            console.error("updateStatus 에러:", err.message || err);
+        } finally {
+            lastUpdate = now;
+        }
     }
-};
+}
 
 export async function startWorker() {
     let Timeout = 1000 * 60 * 60;
@@ -38,6 +51,12 @@ export async function startWorker() {
         if (queue.length === 0) return (Timeout = 1000 * 60);
 
         const trackId = queue[0].trackId;
+
+        await pendingqueue.deleteMany({ trackId: trackId });
+        await new historyQueue({
+            identifier: queue[0].identifier,
+            trackId: trackId
+        }).save();
 
         const trackRes = await axios.get(`https://music.bugs.co.kr/player/track/${trackId}`);
         const lyricsRes = await axios.get(`https://music.bugs.co.kr/player/lyrics/T/${trackId}`);
@@ -59,16 +78,10 @@ export async function startWorker() {
         const albumImgRes = await axios.get(`https://image.bugsm.co.kr/album/images/original/${albumId.slice(0, -2)}/${albumId}.jpg`, { responseType: 'arraybuffer' });
         const albumBuffer: Buffer = Buffer.from(albumImgRes.data, 'binary');
 
-        await sharp(albumBuffer).toFile('public/album-cover.png');
+        await sharp(albumBuffer).toFile(ALBUM_COVER_PATH);
 
         await execAsync('yarn run make-blurred', { cwd: process.cwd() });
         await execAsync('yarn run convert-webp', { cwd: process.cwd() });
-
-        await pendingqueue.deleteMany({ trackId: trackId });
-        await new historyQueue({
-            identifier: queue[0].identifier,
-            trackId: trackId
-        }).save();
 
         await updateStatus({
             title: title,
@@ -87,7 +100,7 @@ export async function startWorker() {
             return Timeout = 1000 * 60;
         }
 
-        const audioMeta: any = await mm.parseFile('public/audio.mp3');
+        const audioMeta: any = await mm.parseFile(AUDIO_PATH);
         const audioTime: number = audioMeta.format.duration;
 
         const songInfo = {
@@ -98,7 +111,7 @@ export async function startWorker() {
             lyrics: lyrics,
         }
 
-        await writeFile('public/song-info.json', JSON.stringify(songInfo, null, 2), 'utf-8');
+        await writeFile(SONG_INFO_PATH, JSON.stringify(songInfo, null, 2), 'utf-8');
 
         await new Promise(async (resolve, reject) => {
             const child = spawn('npx', ['remotion', 'render', 'remotion/index.ts'], { cwd: process.cwd(), shell: true });
@@ -117,13 +130,10 @@ export async function startWorker() {
                     const total = parseInt(frameMatch[2], 10);
                     const progress = ((current / total) * 100).toFixed(2);
 
-                    const remainingRaw = remainingMatch[1];
-                    const durMatch = remainingRaw.match(/(\d+)h\s*(\d+)m\s*(\d+)s/);
-
                     await updateStatus({
                         status: '렌더링',
                         progress: progress,
-                        duration: `${durMatch}`,
+                        duration: `${ remainingMatch[1]}`,
                     });
                 }
 
@@ -149,7 +159,7 @@ export async function startWorker() {
         );
 
         const videoOptions: any = [{
-            path: 'out/Composition.mp4',
+            path: VIDEO_PATH,
             title: String(`${artist.replace(/\([^)]*\)/g, '').trim()} - ${title.replace(/\([^)]*\)/g, '').replace("(", "").replace(")", "").trim()} [${album}]ㅣ가사/Lyrics`),
             description: String([
                 `🎶 본 영상은 가사 자막 영상입니다, 수익 창출은 되지 않습니다.`,
@@ -188,14 +198,14 @@ export async function startWorker() {
             artist: "",
             album: "",
             StartAt: 0,
-            status: '대기',
+            status: '다음 작업 대기',
             progress: 0,
             duration: '0시간 0분 0초',
         });
 
         try {
             await upload(credentials, videoOptions, { headless: false });
-        } catch(err) {
+        } catch (err) {
             console.log(err);
             console.log("[Upload] YouTube 업로드 실패, 1시간 후 다시 실행합니다")
             return Timeout = 1000 * 60 * 1;
