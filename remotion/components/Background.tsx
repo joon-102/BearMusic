@@ -8,7 +8,7 @@ const Background = () => {
         className="absolute inset-0 w-full h-full object-cover"
         src={staticFile("dist/blurred-album-cover.webp")}
       />
-      <div className="absolute inset-0 bg-black/10" style={{ opacity: 0.3 }} />
+      <div className="absolute inset-0 bg-black/30"  />
     </AbsoluteFill>
   );
 };

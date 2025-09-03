@@ -1,10 +1,20 @@
-import { memo } from "react";
+import { memo, useMemo } from "react";
 import { AbsoluteFill, spring } from "remotion";
 
 const DarkOverlay = ({ fps, frame }: { fps: number; frame: number }) => {
 
-    const opacity = spring({ frame, fps, from: 0, to: 1, delay: fps });
-
+    const opacity = useMemo(
+        () =>
+            spring({
+                frame,
+                fps,
+                from: 0,
+                to: 1,
+                delay: fps,
+            }),
+        [frame, fps]
+    );
+    
     return (
         <>
             <AbsoluteFill className="relative w-[1155px] h-full left-[1228px]" style={{ opacity }}>
@@ -18,3 +28,5 @@ const DarkOverlay = ({ fps, frame }: { fps: number; frame: number }) => {
 };
 
 export default memo(DarkOverlay);
+
+
