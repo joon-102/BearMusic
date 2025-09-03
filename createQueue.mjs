@@ -63,7 +63,7 @@ const INTERVAL = 1000 * 60 * 60 * 3; // 3시간
             const lyrics = await getSinklyrics(trackId);
 
             if (!lyrics) {
-                console.log(`trackId ${trackId}의 가사를 찾을 수 없습니다.`);
+                console.log(`${trackId}의 가사를 찾을 수 없습니다.`);
                 continue;
             }
 
