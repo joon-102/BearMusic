@@ -1,18 +1,19 @@
-import axios from 'axios';
+import { exec, spawn } from 'node:child_process';
 import timers from 'node:timers/promises';
-import { exec } from 'child_process';
-import { promisify } from 'util';
-import sharp from 'sharp';
-import { writeFile } from 'fs/promises';
-import mm from 'music-metadata';
-import { upload } from 'youtube-videos-uploader';
-import dayjs from 'dayjs';
-import { spawn } from 'node:child_process';
 import path from 'path';
+import { promisify } from 'util';
+import { writeFile } from 'fs/promises';
+
+import axios from 'axios';
+import dayjs from 'dayjs';
+import mm from 'music-metadata';
+import sharp from 'sharp';
+import { upload } from 'youtube-videos-uploader';
 
 import pendingqueue from '../models/pendingQueue';
 import historyQueue from '../models/historyQueue';
 import RenderStatus from '../models/RenderStatus';
+
 import { Finder } from '../services/Finder';
 
 const execAsync = promisify(exec);
@@ -132,8 +133,8 @@ export async function startWorker() {
 
                     await updateStatus({
                         status: '렌더링',
-                        progress: progress,
-                        duration: `${ remainingMatch[1]}`,
+                        progress: String(progress).replace(/[^a-zA-Z0-9 ]/g, '').replace(/(\r\n|\n|\r)/g, ""),
+                        duration: `${remainingMatch[1]}`,
                     });
                 }
 
@@ -175,7 +176,7 @@ export async function startWorker() {
                 `📝 영상 피드백을 받고 있습니다!`,
                 `Forms: https://bit.ly/46duNSf`,
                 ``,
-                `#${artist.replace(/[^a-zA-Z0-9가-힣]/g, '')} #${title.replace(/[^a-zA-Z0-9가-힣]/g, '')} #가사`
+                `#${artist.replace(/\([^)]*\)/g, '').replace("(", "").replace(")", "").trim().replace(/[^a-zA-Z0-9가-힣]/g, '')} #${title.replace(/\([^)]*\)/g, '').replace("(", "").replace(")", "").trim().replace(/[^a-zA-Z0-9가-힣]/g, '')} #가사`
             ].join('\n')),
             language: 'korean',
             skipProcessingWait: true,
