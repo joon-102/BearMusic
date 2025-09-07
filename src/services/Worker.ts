@@ -115,7 +115,15 @@ export async function startWorker() {
         await writeFile(SONG_INFO_PATH, JSON.stringify(songInfo, null, 2), 'utf-8');
 
         await new Promise(async (resolve, reject) => {
-            const child = spawn('npx', ['remotion', 'render', 'remotion/index.ts'], { cwd: process.cwd(), shell: true });
+            const args = ["remotion", "render", "remotion/index.ts"];
+
+            if (process.env.GL) {
+                args.push(`--gl=${process.env.GL}`);
+            }
+
+            const child = spawn('npx', args, { cwd: process.cwd(), shell: true });
+
+            console.log(`args : ${args.join(' ')}`)
 
             child.stdout.on('data', async (data) => {
                 const str = data.toString();
@@ -133,8 +141,8 @@ export async function startWorker() {
 
                     await updateStatus({
                         status: '렌더링',
-                        progress: String(progress).replace(/[^a-zA-Z0-9 ]/g, '').replace(/(\r\n|\n|\r)/g, ""),
-                        duration: `${remainingMatch[1]}`,
+                        progress: String(progress),
+                        duration: `${String(remainingMatch[1]).replace(/(\r\n|\n|\r)/g, " ").trim()}`,
                     });
                 }
 
