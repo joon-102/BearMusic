@@ -64,7 +64,7 @@ MONGO_URI=""
 CHROME_PATH="C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe"
 GOOGLE_ACCOUNT_EMAIL=""
 GOOGLE_ACCOUNT_PASS=""
-GL="
+GL=""
 ```
 #### 실행
 > `createQueue.mjs`는 차트 기반 자동 플레이리스트를 구성하는 스크립트입니다.  
